@@ -1,57 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import React, { useState } from 'react';
 import './App.css';
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { useAppDispatch } from './stores/hooks';
+import { setFirebaseApp } from './reducers/app.reducer';
+import { firebaseConfig } from './firebase.config';
+import { BrowserRouter  } from 'react-router-dom';
+import SideBar from './components/Sidebar/SideBar';
+import Content from './components/Content/Content';
 
-function App() {
+const App = () => {
+  const dispatch = useAppDispatch();
+  const app: FirebaseApp = initializeApp(firebaseConfig);
+
+  dispatch(setFirebaseApp(app));
+
+  const [sidebarIsOpen, setSidebarOpen] = useState(true);
+  const toggleSidebar = () => setSidebarOpen(!sidebarIsOpen);
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="App wrapper">
+        <SideBar toggle={toggleSidebar} isOpen={sidebarIsOpen} />
+        <Content sidebarIsOpen={sidebarIsOpen} />
+      </div>
+  </BrowserRouter>
   );
 }
 
