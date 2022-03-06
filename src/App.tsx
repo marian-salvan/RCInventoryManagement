@@ -13,17 +13,14 @@ const App = () => {
   const app: FirebaseApp = initializeApp(firebaseConfig);
 
   dispatch(setFirebaseApp(app));
-
-  const [sidebarIsOpen, setSidebarOpen] = useState(true);
-  const toggleSidebar = () => setSidebarOpen(!sidebarIsOpen);
   
   return (
     <BrowserRouter>
       <div className="App wrapper">
-        <SideBar toggle={toggleSidebar} isOpen={sidebarIsOpen} />
-        <Content sidebarIsOpen={sidebarIsOpen} />
+        <SideBar />
+        <Content />
       </div>
-  </BrowserRouter>
+    </BrowserRouter>
   );
 }
 
