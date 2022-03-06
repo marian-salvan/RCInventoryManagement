@@ -1,2 +1,2 @@
 # RCInventoryManagement
-Inventory Manag
+Inventory Management - React + Redux + Firebase project
