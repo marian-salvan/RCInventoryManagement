@@ -1,12 +1,14 @@
 import { FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { FC, useState, } from 'react';
+import { FC, useEffect, useState, } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, CardTitle, Form, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { emailRegex } from '../../constants/app.constants';
 import { LoginModel } from '../../models/login.model';
-import { firebaseApp } from '../../reducers/app.reducer';
+import { firebaseApp, fireStoreDatabase, loggedUser } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { signInUserAsync } from '../../thunks/auth.thunk';
+import { getLoggedInUserMetaDataAsync } from '../../thunks/users.thunk';
 import './Login.css';
 
 interface LoginProps {}
@@ -14,6 +16,18 @@ interface LoginProps {}
 const Login: FC<LoginProps> = () => {
   const dispatch = useAppDispatch();
   const app = useAppSelector(firebaseApp);
+  const user = useAppSelector(loggedUser)
+
+  const db = useAppSelector(fireStoreDatabase);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user != null) {
+      navigate("/products");
+      const email = user.email as string;
+      dispatch(getLoggedInUserMetaDataAsync({db, email}));
+     }
+  }, [user])
 
   const [loginModel, setLoginModel] = useState<LoginModel>({
     email: '',

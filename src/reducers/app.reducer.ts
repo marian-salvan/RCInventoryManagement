@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FirebaseApp } from 'firebase/app';
-import { UserCredential } from 'firebase/auth';
+import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
+import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getLoggedInUserMetaDataAsync } from '../thunks/users.thunk';
@@ -9,9 +10,10 @@ import { getLoggedInUserMetaDataAsync } from '../thunks/users.thunk';
 export interface AppState {
   firebaseApp: FirebaseApp | null;
   sideBarIsOpen: boolean;
-  loggedUser: UserCredential | null;
+  loggedUser: User | null;
   showLoader: boolean;
   database: Firestore | null;
+  loggedInUserMetadata: UserMetadataModel | null;
 }
 
 const initialState: AppState = {
@@ -19,7 +21,8 @@ const initialState: AppState = {
   sideBarIsOpen: true,
   loggedUser: null,
   showLoader: false,
-  database: null
+  database: null,
+  loggedInUserMetadata: null
 };
 
 export const appSlice = createSlice({
@@ -35,6 +38,9 @@ export const appSlice = createSlice({
     },
     setFirebaseDb: (state, action: PayloadAction<Firestore | null>) => {
       state.database = action.payload;
+    },
+    setLoggedInUser: (state, action: PayloadAction<User | null>) => {
+      state.loggedUser = action.payload;
     }
   },
 
@@ -44,7 +50,6 @@ export const appSlice = createSlice({
         state.showLoader = true;
       })
       .addCase(signInUserAsync.fulfilled, (state, action) => {
-        state.loggedUser = action.payload;
         state.showLoader = false;
       })
       .addCase(signInUserAsync.rejected, (state, action) => {
@@ -61,25 +66,24 @@ export const appSlice = createSlice({
         state.showLoader = true;
       })
       .addCase(getLoggedInUserMetaDataAsync.fulfilled, (state, action) => {
-        
-        action.payload.forEach(doc => {
-          console.log(doc.data())
-        })
-
+        state.loggedInUserMetadata = action.payload.docs[0].data() as UserMetadataModel;
+        console.log(state.loggedInUserMetadata);
         state.showLoader = false;
       })
       .addCase(getLoggedInUserMetaDataAsync.rejected, (state, action) => {
         state.showLoader = false;
+        console.log("not allowed");
       })
   },
 });
 
-export const { setFirebaseApp, setFirebaseDb, setSideBarIsOpen } = appSlice.actions;
+export const { setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser } = appSlice.actions;
 
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
 export const sideBarIsOpen = (state: RootState) => state.appReducer.sideBarIsOpen;
 export const loggedUser = (state: RootState) => state.appReducer.loggedUser;
 export const showLoader = (state: RootState) => state.appReducer.showLoader;
 export const fireStoreDatabase = (state: RootState) => state.appReducer.database;
+export const loggedInUserMetadata = (state: RootState) => state.appReducer.loggedInUserMetadata;
 
 export default appSlice.reducer;
