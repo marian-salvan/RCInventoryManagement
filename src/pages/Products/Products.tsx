@@ -1,10 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import AddProductModal from '../../components/AddProductModal/AddProductModal';
+import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
+import { deleteProductModalMessage, deleteProductModalTitle } from '../../constants/messages.constants';
 import { ProductModel } from '../../models/products.models';
-import { allProducts, fireStoreDatabase, setAddProductModal, showAddProductModal } from '../../reducers/app.reducer';
+import { actionAccepted, allProducts, fireStoreDatabase, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { getAllProductsAsync } from '../../thunks/products.thunk';
+import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
 import './Products.css';
 
 interface ProductsProps {}
@@ -13,13 +15,45 @@ const Products: FC<ProductsProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
   const products = useAppSelector(allProducts);
+  const deleteConfirmation = useAppSelector(actionAccepted);
+  const newProduct = useAppSelector(productToBeAdded);
+  const reload = useAppSelector(reloadProductsTable);
 
   useEffect(() => {
     dispatch(getAllProductsAsync(db));
   }, []);
 
+  useEffect(() => {
+    if (reload) {
+      dispatch(setReloadProductsTable());
+      dispatch(getAllProductsAsync(db));
+    }
+
+  }, [reload]);
+
+  useEffect(() => {
+    if (deleteConfirmation) {
+      dispatch(setActionAccepted());
+      const productName = "test3"
+      dispatch(deleteProductAsync({db, productName}));
+    }
+  }, [deleteConfirmation])
+
+  useEffect(() => {
+    if (newProduct) {
+      const product = newProduct as ProductModel;
+
+      dispatch(createProductAsync({db, product}));
+      dispatch(setProductToBeAdded(null));
+    }
+  }, [newProduct])
+
   const deleteProduct = (product: ProductModel) => {
-    console.log(product)
+    dispatch(setConfirmationModalModel({
+      title: deleteProductModalTitle,
+      message: deleteProductModalMessage
+    }));
+    dispatch(setConfirmationModal());
   }
 
   const showAddModal = () => {
@@ -35,8 +69,7 @@ const Products: FC<ProductsProps> = () => {
             <div className="button-container">
               <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button>
             </div>
-          </CardTitle>
-        
+          </CardTitle>  
           <Table hover className="products-table">
             <thead>
               <tr>
@@ -51,7 +84,7 @@ const Products: FC<ProductsProps> = () => {
               {
                 products?.map((product, index) => (
                 <tr key={product.name}>
-                  <th scope="row">{index}</th>
+                  <th scope="row">{index + 1}</th>
                   <td>{product.name}</td>
                   <td>{product.referencePrice}</td>
                   <td>{product.unit}</td>
@@ -64,6 +97,7 @@ const Products: FC<ProductsProps> = () => {
         </CardBody>
       </Card>
       <AddProductModal />
+      <ConfirmationModal />
     </div>
   );
 }

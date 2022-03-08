@@ -3,14 +3,16 @@ import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, 
 import { MEASSUREMENT_UNITS } from '../../constants/units.enums';
 import { ProductAddModel } from '../../models/forms.models';
 import { ProductModel } from '../../models/products.models';
-import { setAddProductModal, showAddProductModal } from '../../reducers/app.reducer';
+import { fireStoreDatabase, setAddProductModal, setProductToBeAdded, showAddProductModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { createProductAsync } from '../../thunks/products.thunk';
 import './AddProductModal.css';
 
 interface AddProductModalProps {}
 
 const AddProductModal: FC<AddProductModalProps> = () => {
   const dispatch = useAppDispatch();
+  const db = useAppSelector(fireStoreDatabase);
   const showModal = useAppSelector(showAddProductModal);
   const [addProductModel, setAddProductMode] = useState<ProductAddModel>({
     name: "",
@@ -66,13 +68,13 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   }
 
   const saveProduct = () => {
-    console.log(addProductModel);
-    const saveProduct: ProductModel = { 
+    const product: ProductModel = { 
       name: addProductModel.name, 
       referencePrice: addProductModel.referencePrice, 
       unit: addProductModel.unit
     };
 
+    dispatch(setProductToBeAdded(product));
     toggle();
   }
 
