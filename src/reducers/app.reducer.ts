@@ -2,9 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
+import { ProductModel } from '../models/products.models';
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
+import { getAllProductsAsync } from '../thunks/products.thunk';
 import { getLoggedInUserMetaDataAsync } from '../thunks/users.thunk';
 
 export interface AppState {
@@ -14,6 +16,8 @@ export interface AppState {
   showLoader: boolean;
   database: Firestore | null;
   loggedInUserMetadata: UserMetadataModel | null;
+  allProducts: ProductModel[] | null;
+  showAddProductModal: boolean;
 }
 
 const initialState: AppState = {
@@ -22,7 +26,9 @@ const initialState: AppState = {
   loggedUser: null,
   showLoader: false,
   database: null,
-  loggedInUserMetadata: null
+  loggedInUserMetadata: null,
+  allProducts: null,
+  showAddProductModal: false
 };
 
 export const appSlice = createSlice({
@@ -41,6 +47,9 @@ export const appSlice = createSlice({
     },
     setLoggedInUser: (state, action: PayloadAction<User | null>) => {
       state.loggedUser = action.payload;
+    },
+    setAddProductModal: (state) => {
+      state.showAddProductModal = !state.showAddProductModal;
     }
   },
 
@@ -55,6 +64,7 @@ export const appSlice = createSlice({
       .addCase(signInUserAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
+
       .addCase(signOutUserAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -62,6 +72,7 @@ export const appSlice = createSlice({
         state.showLoader = false;
         state.loggedUser = null;
       })
+
       .addCase(getLoggedInUserMetaDataAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -74,16 +85,30 @@ export const appSlice = createSlice({
         state.showLoader = false;
         console.log("not allowed");
       })
+
+      .addCase(getAllProductsAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getAllProductsAsync.fulfilled, (state, action) => {
+        state.allProducts = action.payload.docs.map(doc => doc.data() as ProductModel);
+        state.showLoader = false;
+      })
+      .addCase(getAllProductsAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        console.log("not allowed");
+      })
   },
 });
 
-export const { setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser } = appSlice.actions;
+export const { setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, setAddProductModal } = appSlice.actions;
 
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
 export const sideBarIsOpen = (state: RootState) => state.appReducer.sideBarIsOpen;
+export const showAddProductModal = (state: RootState) => state.appReducer.showAddProductModal;
 export const loggedUser = (state: RootState) => state.appReducer.loggedUser;
 export const showLoader = (state: RootState) => state.appReducer.showLoader;
 export const fireStoreDatabase = (state: RootState) => state.appReducer.database;
 export const loggedInUserMetadata = (state: RootState) => state.appReducer.loggedInUserMetadata;
+export const allProducts = (state: RootState) => state.appReducer.allProducts;
 
 export default appSlice.reducer;

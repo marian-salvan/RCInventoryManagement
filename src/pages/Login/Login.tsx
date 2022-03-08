@@ -16,8 +16,8 @@ interface LoginProps {}
 const Login: FC<LoginProps> = () => {
   const dispatch = useAppDispatch();
   const app = useAppSelector(firebaseApp);
+  const auth = getAuth(app as FirebaseApp);
   const user = useAppSelector(loggedUser)
-
   const db = useAppSelector(fireStoreDatabase);
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const Login: FC<LoginProps> = () => {
       navigate("/products");
       const email = user.email as string;
       dispatch(getLoggedInUserMetaDataAsync({db, email}));
-     }
+    }
   }, [user])
 
   const [loginModel, setLoginModel] = useState<LoginModel>({
@@ -34,8 +34,6 @@ const Login: FC<LoginProps> = () => {
     password: '',
     valid: null
   });
-
-  const auth = getAuth(app as FirebaseApp);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;

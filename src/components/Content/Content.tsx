@@ -13,9 +13,12 @@ import Login from "../../pages/Login/Login";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import AccessDenied from "../../pages/AccessDenied/AccessDenied";
 import AdminRoute from "../AdminRoute/AdminRoute";
+import InventoryManagerRoute from "../InventoryManagerRoute/InventoryManagerRoute";
+import PackageManagerRoute from "../PackageManagerRoute/PackageManagerRoute";
 
 const Content = () => {
   const isOpen = useAppSelector(sideBarIsOpen);
+  
   return (
     <Container
       fluid
@@ -28,8 +31,17 @@ const Content = () => {
             <Products />
           </ProtectedRoute>
           }/>
-        <Route path="/inventory" element={ <Inventory /> } />
-        <Route path="/package-management" element={<PackageManagement />} />
+        <Route path="/inventory" element={
+          <InventoryManagerRoute>
+              <Inventory />
+          </InventoryManagerRoute>
+          }/>
+        <Route path="/package-management"
+         element={
+         <PackageManagerRoute> 
+           <PackageManagement />
+         </PackageManagerRoute> 
+         } />
         <Route path="/reports" element={
             <AdminRoute>
                 <Reports />
