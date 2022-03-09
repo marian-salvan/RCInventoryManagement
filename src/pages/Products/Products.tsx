@@ -19,6 +19,8 @@ const Products: FC<ProductsProps> = () => {
   const newProduct = useAppSelector(productToBeAdded);
   const reload = useAppSelector(reloadProductsTable);
 
+  const [productToBeDeleted, setProductToBeDeleted] = useState<ProductModel | null>(null);
+
   useEffect(() => {
     dispatch(getAllProductsAsync(db));
   }, []);
@@ -34,8 +36,11 @@ const Products: FC<ProductsProps> = () => {
   useEffect(() => {
     if (deleteConfirmation) {
       dispatch(setActionAccepted());
-      const productName = "test3"
-      dispatch(deleteProductAsync({db, productName}));
+
+      if (productToBeDeleted) {
+        const productName = productToBeDeleted.name;
+        dispatch(deleteProductAsync({db, productName}));
+      }
     }
   }, [deleteConfirmation])
 
@@ -54,6 +59,8 @@ const Products: FC<ProductsProps> = () => {
       message: deleteProductModalMessage
     }));
     dispatch(setConfirmationModal());
+
+    setProductToBeDeleted(product);
   }
 
   const showAddModal = () => {
@@ -88,7 +95,7 @@ const Products: FC<ProductsProps> = () => {
                   <td>{product.name}</td>
                   <td>{product.referencePrice}</td>
                   <td>{product.unit}</td>
-                  <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle"></i></td>
+                  <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle" title="Șterge Produs"></i></td>
                 </tr>
                 ))
               }

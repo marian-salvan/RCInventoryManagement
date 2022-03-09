@@ -55,7 +55,7 @@ const SideBar = () => {
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink onClick={ () => logOut()}>Delogare</NavLink>
+            <NavLink onClick={ () => logOut()}>Ieșiți din cont</NavLink>
           </NavItem>
         </Nav>
       </div>

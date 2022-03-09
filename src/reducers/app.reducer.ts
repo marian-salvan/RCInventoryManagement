@@ -5,10 +5,12 @@ import { Firestore } from 'firebase/firestore';
 import { confirmationModalDefaultMessage, confirmationModalDefaultTitle } from '../constants/messages.constants';
 import { ConfirmationModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
+import { ReportModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
+import { getActiveReportsAsync } from '../thunks/reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 
 export interface AppState {
@@ -25,6 +27,7 @@ export interface AppState {
   actionAccepted: boolean;
   productToBeAdded: ProductModel | null;
   reloadProductsTable: boolean;
+  activeReport: ReportModel | null;
 }
 
 const initialState: AppState = {
@@ -44,6 +47,7 @@ const initialState: AppState = {
   actionAccepted: false,
   productToBeAdded: null,
   reloadProductsTable: false,
+  activeReport: null
 };
 
 export const appSlice = createSlice({
@@ -85,6 +89,7 @@ export const appSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      //users
       .addCase(signInUserAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -94,7 +99,6 @@ export const appSlice = createSlice({
       .addCase(signInUserAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
-
       .addCase(signOutUserAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -102,7 +106,6 @@ export const appSlice = createSlice({
         state.showLoader = false;
         state.loggedUser = null;
       })
-
       .addCase(getLoggedInUserMetaDataAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -114,6 +117,7 @@ export const appSlice = createSlice({
         state.showLoader = false;
       })
 
+      //products
       .addCase(getAllProductsAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -124,7 +128,6 @@ export const appSlice = createSlice({
       .addCase(getAllProductsAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
-      
       .addCase(createProductAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -135,7 +138,6 @@ export const appSlice = createSlice({
       .addCase(createProductAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
-
       .addCase(deleteProductAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -144,6 +146,25 @@ export const appSlice = createSlice({
         state.showLoader = false;
       })
       .addCase(deleteProductAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
+
+      //reports
+      .addCase(getActiveReportsAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getActiveReportsAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const report = action.payload.docs[0].data() as ReportModel;
+          state.activeReport = report;
+
+          console.log(state.activeReport.inventory)
+        }
+
+        state.showLoader = false;
+      })
+      .addCase(getActiveReportsAsync.rejected, (state, action) => {
+        console.log(action.payload)
         state.showLoader = false;
       })
   },
@@ -166,5 +187,6 @@ export const loggedInUserMetadata = (state: RootState) => state.appReducer.logge
 export const allProducts = (state: RootState) => state.appReducer.allProducts;
 export const productToBeAdded = (state: RootState) => state.appReducer.productToBeAdded;
 export const reloadProductsTable = (state: RootState) => state.appReducer.reloadProductsTable;
+export const activeReport = (state: RootState) => state.appReducer.activeReport;
 
 export default appSlice.reducer;

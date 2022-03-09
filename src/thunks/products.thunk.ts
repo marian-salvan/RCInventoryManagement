@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { doc, Firestore, collection,  getDoc, getDocs, query, where, runTransaction, orderBy } from "firebase/firestore";
+import { doc, Firestore, collection, getDocs, query, where, runTransaction, orderBy } from "firebase/firestore";
 import { ProductModel } from "../models/products.models";
 
 const getAllProductsAsync = createAsyncThunk(
@@ -17,6 +17,13 @@ const createProductAsync = createAsyncThunk(
         const newDocRef = doc(collection(db as Firestore, "products"));
 
         return await runTransaction(db as Firestore, async (transaction) => {
+            const productsRef = collection(db as Firestore, "products")
+            const querrySnapshot = await getDocs(query(productsRef, where("name", "==", product.name)));
+
+            if (querrySnapshot.docs.length > 0) {
+                throw new Error("Cannot add duplicate product");
+            }
+
             transaction.set(newDocRef, product);           
         });
     }
@@ -27,17 +34,14 @@ const deleteProductAsync = createAsyncThunk(
     async ({db, productName}: {db: Firestore | null, productName: string}) => {
         return await runTransaction(db as Firestore, async (transaction) => {
             const productsRef = collection(db as Firestore, "products")
-
             const querrySnapshot = await getDocs(query(productsRef, where("name", "==", productName)));
 
             querrySnapshot.forEach(foundDoc => {
-                console.log(foundDoc.data())
-                //transaction.delete(foundDoc.ref);
+                transaction.delete(foundDoc.ref);
             })
         });
     }
 )
-
 
 export { getAllProductsAsync, createProductAsync, deleteProductAsync};
 
