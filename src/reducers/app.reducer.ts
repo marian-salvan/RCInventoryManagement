@@ -10,7 +10,7 @@ import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
-import { getActiveReportsAsync } from '../thunks/reports.thunk';
+import { addQtyFromProductAsync, createActiveReportAsync, getActiveReportsAsync } from '../thunks/reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 
 export interface AppState {
@@ -27,7 +27,9 @@ export interface AppState {
   actionAccepted: boolean;
   productToBeAdded: ProductModel | null;
   reloadProductsTable: boolean;
+  reloadReportsTable: boolean;
   activeReport: ReportModel | null;
+  showQuantityModal: boolean;
 }
 
 const initialState: AppState = {
@@ -47,7 +49,9 @@ const initialState: AppState = {
   actionAccepted: false,
   productToBeAdded: null,
   reloadProductsTable: false,
-  activeReport: null
+  reloadReportsTable: false,
+  activeReport: null,
+  showQuantityModal: false
 };
 
 export const appSlice = createSlice({
@@ -84,6 +88,12 @@ export const appSlice = createSlice({
     },
     setReloadProductsTable: (state) => {
       state.reloadProductsTable = !state.reloadProductsTable;
+    },
+    setReloadReportsTable: (state) => {
+      state.reloadReportsTable = !state.reloadReportsTable;
+    },  
+    setQuantityModal: (state) => {
+      state.showQuantityModal = !state.showQuantityModal;
     }
   },
 
@@ -157,14 +167,31 @@ export const appSlice = createSlice({
         if (action.payload.docs.length > 0) {
           const report = action.payload.docs[0].data() as ReportModel;
           state.activeReport = report;
-
-          console.log(state.activeReport.inventory)
         }
 
         state.showLoader = false;
       })
       .addCase(getActiveReportsAsync.rejected, (state, action) => {
-        console.log(action.payload)
+        state.showLoader = false;
+      })
+      .addCase(createActiveReportAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(createActiveReportAsync.fulfilled, (state, action) => {
+        state.reloadReportsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(createActiveReportAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
+      .addCase(addQtyFromProductAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(addQtyFromProductAsync.fulfilled, (state, action) => {
+        state.reloadReportsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(addQtyFromProductAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
   },
@@ -172,7 +199,8 @@ export const appSlice = createSlice({
 
 export const { setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
   setAddProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
-  setProductToBeAdded, setReloadProductsTable } = appSlice.actions;
+  setProductToBeAdded, setReloadProductsTable, setReloadReportsTable,
+  setQuantityModal } = appSlice.actions;
 
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
 export const sideBarIsOpen = (state: RootState) => state.appReducer.sideBarIsOpen;
@@ -187,6 +215,8 @@ export const loggedInUserMetadata = (state: RootState) => state.appReducer.logge
 export const allProducts = (state: RootState) => state.appReducer.allProducts;
 export const productToBeAdded = (state: RootState) => state.appReducer.productToBeAdded;
 export const reloadProductsTable = (state: RootState) => state.appReducer.reloadProductsTable;
+export const reloadReportsTable = (state: RootState) => state.appReducer.reloadReportsTable;
 export const activeReport = (state: RootState) => state.appReducer.activeReport;
+export const showQuantityModal = (state: RootState) => state.appReducer.showQuantityModal;
 
 export default appSlice.reducer;

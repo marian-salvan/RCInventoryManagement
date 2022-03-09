@@ -1,8 +1,8 @@
 import { FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { FC, useEffect, useState, } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Card, CardBody, CardTitle, Form, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, CardBody, CardSubtitle, CardTitle, Form, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { emailRegex } from '../../constants/app.constants';
 import { LoginModel } from '../../models/login.model';
 import { firebaseApp, fireStoreDatabase, loggedUser } from '../../reducers/app.reducer';
@@ -67,7 +67,8 @@ const Login: FC<LoginProps> = () => {
     <div className="login">
       <Card>
         <CardBody>
-          <CardTitle>Intră în cont</CardTitle>
+          <CardTitle><h4>CRR Cluj - Management de donații</h4></CardTitle>
+          <CardSubtitle><h5>Intră în cont</h5></CardSubtitle>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
               <Label for="exampleEmail">Email</Label>

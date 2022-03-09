@@ -1,13 +1,14 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
-import AddProductModal from '../../components/AddProductModal/AddProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
-import { closeCurrentInventoryMessage, closeCurrentInventoryTitle, createCurrentInventoryMessage, createCurrentInventoryTitle } from '../../constants/messages.constants';
+import QuantityModal from '../../components/QuantityModal/QuantityModal';
+import { addQuantityModalMessage, addQuantityModalTitle, closeCurrentInventoryMessage, closeCurrentInventoryTitle, createCurrentInventoryMessage, createCurrentInventoryTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
-import { ProductModel } from '../../models/products.models';
-import { actionAccepted, activeReport, fireStoreDatabase, reloadProductsTable, setAddProductModal, setConfirmationModal, setConfirmationModalModel } from '../../reducers/app.reducer';
+import { defaultReportModel, ReportProductModel } from '../../models/reports.models';
+import { actionAccepted, activeReport, allProducts, fireStoreDatabase, reloadProductsTable, reloadReportsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setQuantityModal, setReloadProductsTable, setReloadReportsTable, showQuantityModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { getActiveReportsAsync } from '../../thunks/reports.thunk';
+import { getAllProductsAsync } from '../../thunks/products.thunk';
+import { addQtyFromProductAsync, createActiveReportAsync, getActiveReportsAsync } from '../../thunks/reports.thunk';
 import  './Inventory.css';
 
 interface InventoryProps {}
@@ -15,26 +16,91 @@ interface InventoryProps {}
 const Inventory: FC<InventoryProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
-  const reload = useAppSelector(reloadProductsTable);
-  const report = useAppSelector(activeReport);
-  const closeInventoryConfirmation = useAppSelector(actionAccepted);
+  const reload = useAppSelector(reloadReportsTable);
+  const currentReport = useAppSelector(activeReport);
+  const availableProducts = useAppSelector(allProducts);
+  const inventoryConfirmation = useAppSelector(actionAccepted);
+
+  const [createInventory, setCreateInventory] = useState(false)
+  const [closeInventory, setCloseInventory] = useState(false);
+
+  const [quantityModalConfing, setQuantityModalConfig] = useState({
+    title: "",
+    buttonText: "",
+    addDelete: false
+  });
+
 
   useEffect(() => {
     dispatch(getActiveReportsAsync(db));
   }, []);
 
   useEffect(() => {
-    if (closeInventoryConfirmation) {
-      console.log("da");
+    if (reload) {
+      dispatch(setReloadReportsTable());
+      dispatch(getActiveReportsAsync(db));
     }
-  }, [closeInventoryConfirmation])
 
-  const openAddQtyModal = (product: ProductModel) => {
+  }, [reload]);
+
+  useEffect(() => {
+    if (inventoryConfirmation) {
+      dispatch(setActionAccepted());
+
+      if (createInventory) {
+        dispatch(getAllProductsAsync(db));
+      }
+
+      if (closeInventory) {
+        setCloseInventory(false);
+      }
+    }
+  }, [inventoryConfirmation])
+
+  useEffect(() => {
+    if (availableProducts && availableProducts.length > 0 && createInventory) {
+      console.log(availableProducts);
+      let inventory: ReportProductModel[] = [];
+
+      availableProducts.map(p => {
+        let reportProductModel: ReportProductModel = {
+          name: p.name,
+          unit: p.unit,
+          referencePrice: p.referencePrice,
+          totalPrice: 0,
+          quantity: 0
+        }
+
+        inventory.push(reportProductModel);
+      });
+
+      defaultReportModel.inventory = inventory;
+      let report = defaultReportModel;
+      dispatch(createActiveReportAsync({db, report}));
+
+      setCreateInventory(false);
+    }
+  }, [availableProducts])
+
+  const openAddQtyModal = (report: ReportProductModel) => {
+    setQuantityModalConfig({
+      title: addQuantityModalTitle,
+      buttonText: addQuantityModalMessage,
+      addDelete: true
+    });
+    dispatch(setQuantityModal());
+
+    dispatch(addQtyFromProductAsync({db, report}))
 
   }
 
-  const openRemoveQtyModal = (product: ProductModel) => {
-
+  const openRemoveQtyModal = (product: ReportProductModel) => {
+    setQuantityModalConfig({
+      title: removeQuantityModalTitle,
+      buttonText:  removeQuantityModalMessage,
+      addDelete: false
+    });
+    dispatch(setQuantityModal());
   }
 
   const showCloseConfirmationModal = () => {
@@ -43,6 +109,7 @@ const Inventory: FC<InventoryProps> = () => {
       message: closeCurrentInventoryMessage
     }));
 
+    setCloseInventory(true);
     dispatch(setConfirmationModal());  
   }
 
@@ -52,16 +119,17 @@ const Inventory: FC<InventoryProps> = () => {
       message: createCurrentInventoryMessage
     }));
     
+    setCreateInventory(true);
     dispatch(setConfirmationModal());  
   }
 
-  if (report?.inventory && report.active && report.inventory.length > 0) {
+  if (currentReport?.inventory && currentReport.active && currentReport.inventory.length > 0) {
     return ( 
       <div className="products-container">
          <Card>
           <CardBody>
             <CardTitle className="card-title">
-              <h4>Inventar (perioada: {convertTimeStampToDateString(report?.fromDate.seconds as number)} - {getCurrentDateString()})</h4>
+              <h4>Inventar (perioada: {convertTimeStampToDateString(currentReport?.fromDate.seconds as number)} - {getCurrentDateString()})</h4>
               <div className="button-container">
                 <Button className="add-button" color="primary" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
               </div>
@@ -80,15 +148,15 @@ const Inventory: FC<InventoryProps> = () => {
               </thead>
               <tbody>
                 {
-                  report?.inventory.map((product, index) => (
+                  currentReport?.inventory.map((product, index) => (
                   <tr key={product.name}>
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
                     <td>{product.referencePrice}</td>
                     <td>{product.unit}</td>
                     <td>{product.quantity} ({product.unit})</td>
-                    <td onClick={() => openAddQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
-                    <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
+                    <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
+                    <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
                   </tr>
                   ))
                 }
@@ -96,7 +164,7 @@ const Inventory: FC<InventoryProps> = () => {
             </Table> 
           </CardBody>
         </Card>
-        <AddProductModal />
+        <QuantityModal modalTitle={quantityModalConfing.title} buttonText={quantityModalConfing.buttonText}/>
         <ConfirmationModal />
       </div>
     );

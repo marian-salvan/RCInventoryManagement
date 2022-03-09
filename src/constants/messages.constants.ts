@@ -9,3 +9,7 @@ export const createCurrentInventoryTitle = "Creați inventar";
 export const createCurrentInventoryMessage = `Doriți să creați un inventar nou? Acest inventar va fi
 disponibil până îl veți închide. După închidere, se va crea un raport pe perioda în care a fost deschis
 inventarul.`;
+export const addQuantityModalTitle = "Adaugă la cantitate";
+export const addQuantityModalMessage = "Adaugă";
+export const removeQuantityModalTitle = "Scade din cantitate";
+export const removeQuantityModalMessage = "Scade";

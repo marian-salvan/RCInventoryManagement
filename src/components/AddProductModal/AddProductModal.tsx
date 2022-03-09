@@ -80,7 +80,6 @@ const AddProductModal: FC<AddProductModalProps> = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(addProductModel);
   }
 
   return (

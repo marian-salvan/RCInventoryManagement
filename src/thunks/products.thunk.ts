@@ -21,7 +21,7 @@ const createProductAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(productsRef, where("name", "==", product.name)));
 
             if (querrySnapshot.docs.length > 0) {
-                throw new Error("Cannot add duplicate product");
+                return Promise.reject("Cannot add duplicate product");
             }
 
             transaction.set(newDocRef, product);           
