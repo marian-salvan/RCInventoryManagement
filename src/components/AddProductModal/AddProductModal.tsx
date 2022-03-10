@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { MEASSUREMENT_UNITS } from '../../constants/units.enums';
-import { ProductAddModel } from '../../models/forms.models';
+import { ProductAddStateModel } from '../../models/forms.models';
 import { ProductModel } from '../../models/products.models';
 import { fireStoreDatabase, setAddProductModal, setProductToBeAdded, showAddProductModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -14,7 +14,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
   const showModal = useAppSelector(showAddProductModal);
-  const [addProductModel, setAddProductMode] = useState<ProductAddModel>({
+  const [addProductModel, setAddProductMode] = useState<ProductAddStateModel>({
     name: "",
     referencePrice: 0,
     validName: null,

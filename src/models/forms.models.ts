@@ -1,11 +1,16 @@
 import { ProductModel } from "./products.models";
 
-export interface ProductAddModel extends ProductModel {
+export interface ProductAddStateModel extends ProductModel {
     validName: boolean | null;
     validReferencePrice: boolean | null;
 }
 
-export interface EditQuantityModel {
+export interface EditQuantityStateModel {
     quantity: number;
     validQuantity: boolean | null;
+}
+
+export interface NewReportStateModel {
+    name: string;
+    validName: boolean | null;
 }

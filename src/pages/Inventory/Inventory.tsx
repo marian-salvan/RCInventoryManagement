@@ -1,14 +1,16 @@
 import { FC, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
+import { Button, Card, CardBody, CardSubtitle, CardTitle, Table } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
+import CreateReportModal from '../../components/CreateReportModal/CreateReportModal';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
-import { addQuantityModalMessage, addQuantityModalTitle, closeCurrentInventoryMessage, closeCurrentInventoryTitle, createCurrentInventoryMessage, createCurrentInventoryTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
+import { defaultReportModel } from '../../constants/default.configs';
+import { addQuantityModalMessage, addQuantityModalTitle, closeCurrentInventoryMessage, closeCurrentInventoryTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
-import { defaultReportModel, ReportProductModel } from '../../models/reports.models';
-import { actionAccepted, activeReport, allProducts, fireStoreDatabase, reloadProductsTable, reloadReportsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setQuantityModal, setReloadProductsTable, setReloadReportsTable, showQuantityModal } from '../../reducers/app.reducer';
+import { ReportProductModel } from '../../models/reports.models';
+import { actionAccepted, activeReport, allProducts, fireStoreDatabase, newReportName, reloadReportsTable, setActionAccepted, setConfirmationModal, setConfirmationModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal, setQuantityModal, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getAllProductsAsync } from '../../thunks/products.thunk';
-import { addQtyFromProductAsync, createActiveReportAsync, getActiveReportsAsync } from '../../thunks/reports.thunk';
+import { closeCurrentReportAsync, createActiveReportAsync, getActiveReportsAsync } from '../../thunks/reports.thunk';
 import  './Inventory.css';
 
 interface InventoryProps {}
@@ -20,8 +22,8 @@ const Inventory: FC<InventoryProps> = () => {
   const currentReport = useAppSelector(activeReport);
   const availableProducts = useAppSelector(allProducts);
   const inventoryConfirmation = useAppSelector(actionAccepted);
+  const reportName = useAppSelector(newReportName);
 
-  const [createInventory, setCreateInventory] = useState(false)
   const [closeInventory, setCloseInventory] = useState(false);
 
   const [quantityModalConfing, setQuantityModalConfig] = useState({
@@ -30,9 +32,9 @@ const Inventory: FC<InventoryProps> = () => {
     addDelete: false
   });
 
-
   useEffect(() => {
     dispatch(getActiveReportsAsync(db));
+    dispatch(getAllProductsAsync(db));
   }, []);
 
   useEffect(() => {
@@ -47,19 +49,14 @@ const Inventory: FC<InventoryProps> = () => {
     if (inventoryConfirmation) {
       dispatch(setActionAccepted());
 
-      if (createInventory) {
-        dispatch(getAllProductsAsync(db));
-      }
-
-      if (closeInventory) {
-        setCloseInventory(false);
-      }
+      dispatch(closeCurrentReportAsync(db));
+      setCloseInventory(false);
     }
-  }, [inventoryConfirmation])
-
+  }, [inventoryConfirmation]);
+  
   useEffect(() => {
-    if (availableProducts && availableProducts.length > 0 && createInventory) {
-      console.log(availableProducts);
+    debugger;
+    if (availableProducts && availableProducts.length > 0 && reportName) {
       let inventory: ReportProductModel[] = [];
 
       availableProducts.map(p => {
@@ -75,32 +72,30 @@ const Inventory: FC<InventoryProps> = () => {
       });
 
       defaultReportModel.inventory = inventory;
+      defaultReportModel.name = reportName;
       let report = defaultReportModel;
       dispatch(createActiveReportAsync({db, report}));
-
-      setCreateInventory(false);
     }
-  }, [availableProducts])
+  }, [availableProducts, reportName])
 
-  const openAddQtyModal = (report: ReportProductModel) => {
+  const openAddQtyModal = (reportProduct: ReportProductModel) => {
     setQuantityModalConfig({
       title: addQuantityModalTitle,
       buttonText: addQuantityModalMessage,
       addDelete: true
     });
     dispatch(setQuantityModal());
-
-    dispatch(addQtyFromProductAsync({db, report}))
-
+    dispatch(setInventoryEntryToAdd(reportProduct));
   }
 
-  const openRemoveQtyModal = (product: ReportProductModel) => {
+  const openRemoveQtyModal = (reportProduct: ReportProductModel) => {
     setQuantityModalConfig({
       title: removeQuantityModalTitle,
       buttonText:  removeQuantityModalMessage,
       addDelete: false
     });
     dispatch(setQuantityModal());
+    dispatch(setInventoryEntryToSubstract(reportProduct));
   }
 
   const showCloseConfirmationModal = () => {
@@ -113,14 +108,8 @@ const Inventory: FC<InventoryProps> = () => {
     dispatch(setConfirmationModal());  
   }
 
-  const showCreateConfirmationModal = () => {
-    dispatch(setConfirmationModalModel({
-      title: createCurrentInventoryTitle,
-      message: createCurrentInventoryMessage
-    }));
-    
-    setCreateInventory(true);
-    dispatch(setConfirmationModal());  
+  const showCreateNewReportModal = () => {
+    dispatch(setNewReportModal());
   }
 
   if (currentReport?.inventory && currentReport.active && currentReport.inventory.length > 0) {
@@ -129,19 +118,21 @@ const Inventory: FC<InventoryProps> = () => {
          <Card>
           <CardBody>
             <CardTitle className="card-title">
-              <h4>Inventar (perioada: {convertTimeStampToDateString(currentReport?.fromDate.seconds as number)} - {getCurrentDateString()})</h4>
+              <h4>Inventar curent: {currentReport.name}</h4>
               <div className="button-container">
                 <Button className="add-button" color="primary" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
               </div>
-            </CardTitle>   
+            </CardTitle>
+            <CardSubtitle><h6>Perioada: {convertTimeStampToDateString(currentReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
             <Table hover className="products-table">
               <thead>
                 <tr>
                   <th>#</th>
                   <th>Nume produs</th>
-                  <th>Preț de referință</th>
                   <th>Unitate de măsură</th>
-                  <th>Cantitate</th>
+                  <th>Preț de referință</th>
+                  <th>Cantitate curentă</th>
+                  <th>Preț total</th>
                   <th>Șterge cantitate</th>
                   <th>Adaugă cantitate</th>
                 </tr>
@@ -152,9 +143,10 @@ const Inventory: FC<InventoryProps> = () => {
                   <tr key={product.name}>
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
-                    <td>{product.referencePrice}</td>
                     <td>{product.unit}</td>
+                    <td>{product.referencePrice}</td>
                     <td>{product.quantity} ({product.unit})</td>
+                    <td>{product.totalPrice}</td>
                     <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
                     <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
                   </tr>
@@ -164,7 +156,7 @@ const Inventory: FC<InventoryProps> = () => {
             </Table> 
           </CardBody>
         </Card>
-        <QuantityModal modalTitle={quantityModalConfing.title} buttonText={quantityModalConfing.buttonText}/>
+        <QuantityModal modalTitle={quantityModalConfing.title} buttonText={quantityModalConfing.buttonText} addQty={quantityModalConfing.addDelete}/>
         <ConfirmationModal />
       </div>
     );
@@ -177,12 +169,13 @@ const Inventory: FC<InventoryProps> = () => {
         <CardTitle className="card-title">
           <h4>Nu există un inventar activ. Doriți să creați unul?</h4>
           <div className="button-container">
-            <Button className="add-button" color="primary" onClick={() => showCreateConfirmationModal()}>Creați inventar nou</Button>
+            <Button className="add-button" color="primary" onClick={() => showCreateNewReportModal()}>Creați inventar nou</Button>
           </div>
         </CardTitle>   
       </CardBody>
       </Card>
       <ConfirmationModal />
+      <CreateReportModal />
     </div>
   );
 };

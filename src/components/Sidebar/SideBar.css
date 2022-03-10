@@ -36,6 +36,15 @@
     cursor: pointer;
   }
 
+  .nav-item.active-route {
+    background: #fff;
+  }
+
+  .nav-item.active-route .nav-link{
+    color: #7386d5;
+
+  }
+
   .nav-item .nav-link {
       color: #fff;
   }

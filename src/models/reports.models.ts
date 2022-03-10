@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore";
 import { ProductModel } from "./products.models";
 
 export interface ReportModel {
+    name: string;
     active: boolean;
     fromDate: Timestamp;
     toDate?: Timestamp | null;
@@ -16,14 +17,3 @@ export interface ReportCalculationModel {
 
 export interface ReportProductModel extends ReportCalculationModel, ProductModel {
 }
-
-export let defaultReportModel: ReportModel = {
-    active: true,
-    fromDate: Timestamp.fromDate(new Date()),
-    toDate: null,
-    inventory: [],
-    packages: {
-        quantity: 0,
-        totalPrice: 0
-    }
-};

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { doc, Firestore, collection, getDocs, query, where, runTransaction, orderBy } from "firebase/firestore";
+import { genericErrorMessage } from "../constants/messages.constants";
 import { ProductModel } from "../models/products.models";
 
 const getAllProductsAsync = createAsyncThunk(
@@ -14,10 +15,9 @@ const getAllProductsAsync = createAsyncThunk(
 const createProductAsync = createAsyncThunk(
     'app/createProductAsync',
     async ({db, product}: {db: Firestore | null, product: ProductModel}) => {
-        const newDocRef = doc(collection(db as Firestore, "products"));
-
         return await runTransaction(db as Firestore, async (transaction) => {
-            const productsRef = collection(db as Firestore, "products")
+            const newDocRef = doc(collection(db as Firestore, "products"));
+            const productsRef = collection(db as Firestore, "products");
             const querrySnapshot = await getDocs(query(productsRef, where("name", "==", product.name)));
 
             if (querrySnapshot.docs.length > 0) {
@@ -36,9 +36,11 @@ const deleteProductAsync = createAsyncThunk(
             const productsRef = collection(db as Firestore, "products")
             const querrySnapshot = await getDocs(query(productsRef, where("name", "==", productName)));
 
-            querrySnapshot.forEach(foundDoc => {
-                transaction.delete(foundDoc.ref);
-            })
+            if (querrySnapshot.docs.length != 1) {
+                return Promise.reject(genericErrorMessage);
+            }
+
+            transaction.delete(querrySnapshot.docs[0].ref);
         });
     }
 )

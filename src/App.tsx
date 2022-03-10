@@ -29,7 +29,6 @@ const App = () => {
     }
   });
   
-  
   return (
     <BrowserRouter>
       <div className="App wrapper">

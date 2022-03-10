@@ -13,3 +13,4 @@ export const addQuantityModalTitle = "Adaugă la cantitate";
 export const addQuantityModalMessage = "Adaugă";
 export const removeQuantityModalTitle = "Scade din cantitate";
 export const removeQuantityModalMessage = "Scade";
+export const genericErrorMessage = "A apărut o eroare. Încercați din nou!";
