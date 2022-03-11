@@ -9,6 +9,6 @@ export let defaultReportModel: ReportModel = {
     inventory: [],
     packages: {
         quantity: 0,
-        totalPrice: 0
+        totalPackages: 0
     }
 };

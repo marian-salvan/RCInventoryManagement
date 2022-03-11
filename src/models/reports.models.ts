@@ -7,13 +7,15 @@ export interface ReportModel {
     fromDate: Timestamp;
     toDate?: Timestamp | null;
     inventory: ReportProductModel[],
-    packages: ReportCalculationModel
+    packages: ReportPackageModel
 }
 
-export interface ReportCalculationModel {
+export interface ReportPackageModel {
+  quantity: number;
+  totalPackages: number;
+}
+
+export interface ReportProductModel extends ProductModel {
     quantity: number;
     totalPrice: number;
-}
-
-export interface ReportProductModel extends ReportCalculationModel, ProductModel {
 }

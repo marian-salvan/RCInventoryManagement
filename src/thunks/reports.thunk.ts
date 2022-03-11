@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, doc, Firestore, getDoc, getDocs, orderBy, query, runTransaction, Timestamp, where } from "firebase/firestore";
 import { genericErrorMessage } from "../constants/messages.constants";
-import { ReportModel, ReportProductModel } from "../models/reports.models";
+import { ReportModel, ReportPackageModel, ReportProductModel } from "../models/reports.models";
 
 const getActiveReportsAsync = createAsyncThunk(
     'app/getActiveReportAsync',
@@ -53,7 +53,7 @@ const addQtyFromProductAsync = createAsyncThunk(
                 return Promise.reject("Nu am găsit produsul în inventar");
             }
 
-            productToBeUpdated.quantity = productToBeUpdated.quantity + report.quantity;
+            productToBeUpdated.quantity += report.quantity;
             productToBeUpdated.totalPrice = productToBeUpdated.quantity * productToBeUpdated.referencePrice;
 
             transaction.update(querrySnapshot.docs[0].ref, {inventory: docToBeUpdated.inventory});
@@ -83,7 +83,7 @@ const removeQtyFromProductAsync = createAsyncThunk(
                 return Promise.reject("Stoc insuficient");
             }
 
-            productToBeUpdated.quantity = productToBeUpdated.quantity - report.quantity;
+            productToBeUpdated.quantity -= report.quantity;
             productToBeUpdated.totalPrice = productToBeUpdated.quantity * productToBeUpdated.referencePrice;
 
             transaction.update(querrySnapshot.docs[0].ref, {inventory: docToBeUpdated.inventory});
@@ -114,10 +114,61 @@ const closeCurrentReportAsync = createAsyncThunk(
     }
 )
 
+const addPackagesAsync = createAsyncThunk(
+    'app/addPackagesAsync',
+    async ({db, packageReport}: {db: Firestore | null, packageReport: ReportPackageModel}) => {
+        return await runTransaction(db as Firestore, async (transaction) => {
+            const reportsRef = collection(db as Firestore, "reports")
+            const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+
+            if (querrySnapshot.docs.length !== 1) {
+                return Promise.reject(genericErrorMessage);
+            }
+
+            let docToBeUpdated = querrySnapshot.docs[0].data() as ReportModel;
+
+            docToBeUpdated.packages.totalPackages += packageReport.totalPackages;
+            docToBeUpdated.packages.quantity += packageReport.quantity;
+
+            transaction.update(querrySnapshot.docs[0].ref, {packages: docToBeUpdated.packages});
+        });
+    }
+)
+
+const removePackagesAsync = createAsyncThunk(
+    'app/removePackagesAsync',
+    async ({db, packageReport}: {db: Firestore | null, packageReport: ReportPackageModel}) => {
+        return await runTransaction(db as Firestore, async (transaction) => {
+            const reportsRef = collection(db as Firestore, "reports")
+            const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+
+            if (querrySnapshot.docs.length !== 1) {
+                return Promise.reject(genericErrorMessage);
+            }
+
+            let docToBeUpdated = querrySnapshot.docs[0].data() as ReportModel;
+            
+            if (docToBeUpdated.packages.totalPackages - packageReport.totalPackages < 0) {
+                return Promise.reject("Stoc insuficient");
+            }
+            if (docToBeUpdated.packages.quantity - packageReport.quantity < 0) {
+                return Promise.reject("Stoc insuficient");
+            }
+
+            docToBeUpdated.packages.totalPackages -= packageReport.totalPackages;
+            docToBeUpdated.packages.quantity -= packageReport.quantity;
+
+            transaction.update(querrySnapshot.docs[0].ref, {packages: docToBeUpdated.packages});
+        });
+    }
+)
+
 export { 
     getActiveReportsAsync, 
     createActiveReportAsync, 
     addQtyFromProductAsync, 
     removeQtyFromProductAsync,
-    closeCurrentReportAsync
+    closeCurrentReportAsync,
+    addPackagesAsync,
+    removePackagesAsync
 };

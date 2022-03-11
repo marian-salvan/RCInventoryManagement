@@ -3,14 +3,14 @@ import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
 import { confirmationModalDefaultMessage, confirmationModalDefaultTitle } from '../constants/messages.constants';
-import { ConfirmationModalModel } from '../models/modal.models';
+import { AddRemoveModalModel, ConfirmationModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
 import { ReportModel, ReportProductModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
-import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveReportsAsync, removeQtyFromProductAsync } from '../thunks/reports.thunk';
+import { addPackagesAsync, addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveReportsAsync, removePackagesAsync, removeQtyFromProductAsync } from '../thunks/reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 
 export interface AppState {
@@ -30,11 +30,12 @@ export interface AppState {
   reloadProductsTable: boolean;
   reloadReportsTable: boolean;
   activeReport: ReportModel | null;
-  showQuantityModal: boolean;
+  quantityModalModel: AddRemoveModalModel | null;
   inventoryEntryToAdd: ReportProductModel | null;
   inventoryEntryToSubstract: ReportProductModel | null;
   showNewReportModal: boolean;
   newReportName: string | null;
+  packagesModalModel: AddRemoveModalModel | null;
 }
 
 const initialState: AppState = {
@@ -57,11 +58,12 @@ const initialState: AppState = {
   reloadProductsTable: false,
   reloadReportsTable: false,
   activeReport: null,
-  showQuantityModal: false,
+  quantityModalModel: null,
   inventoryEntryToAdd: null,
   inventoryEntryToSubstract: null,
   showNewReportModal: false,
-  newReportName: ""
+  newReportName: "",
+  packagesModalModel: null
 };
 
 export const appSlice = createSlice({
@@ -105,8 +107,8 @@ export const appSlice = createSlice({
     setReloadReportsTable: (state) => {
       state.reloadReportsTable = !state.reloadReportsTable;
     },  
-    setQuantityModal: (state) => {
-      state.showQuantityModal = !state.showQuantityModal;
+    setQuantityModalModel: (state, action: PayloadAction<AddRemoveModalModel | null>) => {
+      state.quantityModalModel = action.payload;
     },
     setInventoryEntryToAdd: (state, action: PayloadAction<ReportProductModel | null>) => {
       state.inventoryEntryToAdd = action.payload;
@@ -119,9 +121,11 @@ export const appSlice = createSlice({
     },
     setNewReportName: (state, action: PayloadAction<string | null>) => {
       state.newReportName = action.payload;
+    },
+    setPackagesModalModel: (state, action: PayloadAction<AddRemoveModalModel | null>) => {
+      state.packagesModalModel = action.payload;
     }
   },
-
   extraReducers: (builder) => {
     builder
       //users
@@ -242,13 +246,35 @@ export const appSlice = createSlice({
       .addCase(closeCurrentReportAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
+
+      .addCase(addPackagesAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(addPackagesAsync.fulfilled, (state, action) => {
+        state.reloadReportsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(addPackagesAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
+      .addCase(removePackagesAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(removePackagesAsync.fulfilled, (state, action) => {
+        state.reloadReportsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(removePackagesAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
   },
 });
 
 export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
   setAddProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
   setProductToBeAdded, setReloadProductsTable, setReloadReportsTable, setNewReportName,
-  setQuantityModal, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal } = appSlice.actions;
+  setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
+  setPackagesModalModel } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -266,10 +292,11 @@ export const productToBeAdded = (state: RootState) => state.appReducer.productTo
 export const reloadProductsTable = (state: RootState) => state.appReducer.reloadProductsTable;
 export const reloadReportsTable = (state: RootState) => state.appReducer.reloadReportsTable;
 export const activeReport = (state: RootState) => state.appReducer.activeReport;
-export const showQuantityModal = (state: RootState) => state.appReducer.showQuantityModal;
+export const quantityModalModel = (state: RootState) => state.appReducer.quantityModalModel;
 export const inventoryEntryToAdd = (state: RootState) => state.appReducer.inventoryEntryToAdd;
 export const inventoryEntryToSubstract = (state: RootState) => state.appReducer.inventoryEntryToSubstract;
 export const showNewReportModal = (state: RootState) => state.appReducer.showNewReportModal;
 export const newReportName = (state: RootState) => state.appReducer.newReportName;
+export const packagesModalModel = (state: RootState) => state.appReducer.packagesModalModel;
 
 export default appSlice.reducer;

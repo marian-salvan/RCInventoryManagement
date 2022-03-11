@@ -1,47 +1,50 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { EditQuantityStateModel } from '../../models/forms.models';
 import { ReportProductModel } from '../../models/reports.models';
-import { fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, setQuantityModal, showQuantityModal } from '../../reducers/app.reducer';
+import { fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, quantityModalModel, setQuantityModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { addQtyFromProductAsync, removeQtyFromProductAsync } from '../../thunks/reports.thunk';
 import  './QuantityModal.css';
 
-interface QuantityModalProps {
-  modalTitle: string;
-  buttonText: string;
-  addQty: boolean;
-}
+interface QuantityModalProps { }
 
-const QuantityModal: FC<QuantityModalProps> = ({modalTitle, buttonText, addQty}) => {
+const QuantityModal: FC<QuantityModalProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
-  const showModal = useAppSelector(showQuantityModal);
+  const quantityModal = useAppSelector(quantityModalModel);
 
   const reportToAdd = useAppSelector(inventoryEntryToAdd);
   const reportToSubstract = useAppSelector(inventoryEntryToSubstract);
 
-
-  const [editQuantityModel, setditQuantityModel] = useState<EditQuantityStateModel>({
+  const [showModal, setShowModal] = useState(false);
+  const [editQuantityModel, setEditQuantityModel] = useState<EditQuantityStateModel>({
     quantity: 0,
     validQuantity: null,
   });
+
+  useEffect(() => {
+    if (quantityModal) {
+      setShowModal(true);
+    }
+  }, [quantityModal])
+  
   
   const toggle = () => {
-    dispatch(setQuantityModal());
-    setditQuantityModel(
-      {
-        quantity: 0,
-        validQuantity: null,
-      }
-    );
+    setEditQuantityModel({
+      quantity: 0,
+      validQuantity: null,
+    });
+
+    setShowModal(false);
+    dispatch(setQuantityModalModel(null));
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = parseFloat(event.target.value);
 
-    setditQuantityModel({
+    setEditQuantityModel({
       ...editQuantityModel,
       [name]: value
     });
@@ -58,7 +61,7 @@ const QuantityModal: FC<QuantityModalProps> = ({modalTitle, buttonText, addQty})
   }
 
   const updateQuantity = () => {
-    if (addQty) {
+    if (quantityModal?.addQty) {
       const report = { ...reportToAdd } as ReportProductModel;
       report.quantity = editQuantityModel.quantity;
       
@@ -80,7 +83,7 @@ const QuantityModal: FC<QuantityModalProps> = ({modalTitle, buttonText, addQty})
   return (
     <div>
       <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>{modalTitle}</ModalHeader>
+        <ModalHeader toggle={toggle}>{quantityModal?.modalTitle}</ModalHeader>
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
@@ -100,7 +103,11 @@ const QuantityModal: FC<QuantityModalProps> = ({modalTitle, buttonText, addQty})
           </Form>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={updateQuantity} disabled={!(editQuantityModel.validQuantity)}>{buttonText}</Button>{' '}
+          <Button color={quantityModal?.buttonClass}
+                  onClick={updateQuantity} 
+                  disabled={!(editQuantityModel.validQuantity)}>
+                    {quantityModal?.buttonText}
+           </Button>{' '}
           <Button color="secondary" onClick={toggle}>Anulează</Button>
         </ModalFooter>
       </Modal>

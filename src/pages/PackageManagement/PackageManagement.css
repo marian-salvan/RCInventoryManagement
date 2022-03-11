@@ -1,1 +1,18 @@
-.PackageManagement {}
+.add-pkgs-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.total-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.total-container .total-container-item {
+    align-self: center;
+}
+
+.total-container .total-container-item {
+    align-self: center;
+}

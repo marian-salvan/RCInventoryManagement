@@ -14,3 +14,10 @@ export interface NewReportStateModel {
     name: string;
     validName: boolean | null;
 }
+
+export interface EditPackagesStateModel {
+    quantity: number;
+    totalPackages: number;
+    validQuantity: boolean | null;
+    validTotalPackages: boolean | null;
+}

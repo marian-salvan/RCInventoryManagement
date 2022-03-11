@@ -13,6 +13,8 @@
 
 .button-container {
     margin-left: auto;
+    display: flex;
+    gap: 10px;
 }
 
 .button-container .add-button {
