@@ -1,37 +1,38 @@
 import { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { MEASSUREMENT_UNITS } from '../../constants/units.enums';
+import { productTypesOptions, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
+import { MEASSUREMENT_UNITS, unitOptions } from '../../constants/units.constants';
 import { ProductAddStateModel } from '../../models/forms.models';
 import { ProductModel } from '../../models/products.models';
-import { fireStoreDatabase, setAddProductModal, setProductToBeAdded, showAddProductModal } from '../../reducers/app.reducer';
+import { setAddProductModal, setProductToBeAdded, showAddProductModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { createProductAsync } from '../../thunks/products.thunk';
 import './AddProductModal.css';
 
 interface AddProductModalProps {}
 
 const AddProductModal: FC<AddProductModalProps> = () => {
   const dispatch = useAppDispatch();
-  const db = useAppSelector(fireStoreDatabase);
   const showModal = useAppSelector(showAddProductModal);
   const [addProductModel, setAddProductMode] = useState<ProductAddStateModel>({
+    uid: "",
     name: "",
     referencePrice: 0,
     validName: null,
     validReferencePrice: null,
+    type: PRODUCT_TYPE_RO.FOOD,
     unit: MEASSUREMENT_UNITS.KG
   });
   
-  const unitOptions: string[] = [MEASSUREMENT_UNITS.KG, MEASSUREMENT_UNITS.L, MEASSUREMENT_UNITS.BUC];
-
   const toggle = () => {
     dispatch(setAddProductModal());
     setAddProductMode(
       {
+        uid: "",
         name: "",
         referencePrice: 0,
         validName: null,
         validReferencePrice: null,
+        type: PRODUCT_TYPE_RO.FOOD,
         unit: MEASSUREMENT_UNITS.KG
       }
     );
@@ -68,10 +69,14 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   }
 
   const saveProduct = () => {
+    const { v4: uuidv4 } = require('uuid');
+
     const product: ProductModel = { 
-      name: addProductModel.name, 
+      uid: uuidv4(),
+      name: addProductModel.name.toLocaleLowerCase(), 
       referencePrice: addProductModel.referencePrice, 
-      unit: addProductModel.unit
+      unit: addProductModel.unit,
+      type: productTypesRoToEngMap.get(addProductModel.type) as string
     };
 
     dispatch(setProductToBeAdded(product));
@@ -115,6 +120,16 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               <FormFeedback>
                 Prețul trebuie să fie mai mare decât 0
               </FormFeedback>
+            </FormGroup>
+            <FormGroup>
+              <Label for="unit">Categorie</Label>
+              <Input type="select" name="type" id="type" onChange={handleInputChange}>
+                {
+                  productTypesOptions.map(opt => (
+                    <option key={opt}>{opt}</option>
+                  ))
+                }
+              </Input>
             </FormGroup>
             <FormGroup>
               <Label for="unit">Unitate de măsură</Label>

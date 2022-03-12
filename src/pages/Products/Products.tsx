@@ -3,6 +3,7 @@ import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import AddProductModal from '../../components/AddProductModal/AddProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import { deleteProductModalMessage, deleteProductModalTitle } from '../../constants/messages.constants';
+import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ProductModel } from '../../models/products.models';
 import { actionAccepted, allProducts, fireStoreDatabase, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -38,8 +39,8 @@ const Products: FC<ProductsProps> = () => {
       dispatch(setActionAccepted());
 
       if (productToBeDeleted) {
-        const productName = productToBeDeleted.name;
-        dispatch(deleteProductAsync({db, productName}));
+        const uid = productToBeDeleted.uid;
+        dispatch(deleteProductAsync({db, uid}));
       }
     }
   }, [deleteConfirmation])
@@ -82,6 +83,7 @@ const Products: FC<ProductsProps> = () => {
               <tr>
                 <th>#</th>
                 <th>Nume produs</th>
+                <th>Categorie</th>
                 <th>Preț de referință</th>
                 <th>Unitate de măsură</th>
                 <th>Șterge Produs</th>
@@ -93,6 +95,7 @@ const Products: FC<ProductsProps> = () => {
                 <tr key={product.name}>
                   <th scope="row">{index + 1}</th>
                   <td>{product.name}</td>
+                  <td>{productTypesEngToRoMap.get(product.type)}</td>
                   <td>{product.referencePrice}</td>
                   <td>{product.unit}</td>
                   <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle" title="Șterge Produs"></i></td>

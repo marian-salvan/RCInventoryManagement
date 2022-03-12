@@ -5,7 +5,7 @@ import { EditPackagesStateModel } from '../../models/forms.models';
 import { ReportPackageModel } from '../../models/reports.models';
 import { fireStoreDatabase, packagesModalModel, setPackagesModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { addPackagesAsync, removePackagesAsync } from '../../thunks/reports.thunk';
+import { addPackagesAsync, removePackagesAsync } from '../../thunks/packages-reports.thunk';
 
 interface EditPackagesModalProps {}
 

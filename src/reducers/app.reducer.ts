@@ -5,13 +5,14 @@ import { Firestore } from 'firebase/firestore';
 import { confirmationModalDefaultMessage, confirmationModalDefaultTitle } from '../constants/messages.constants';
 import { AddRemoveModalModel, ConfirmationModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
-import { ReportModel, ReportProductModel } from '../models/reports.models';
+import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
-import { addPackagesAsync, addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveReportsAsync, removePackagesAsync, removeQtyFromProductAsync } from '../thunks/reports.thunk';
+import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
+import { addPackagesAsync, getActivePackagesReportsAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
 
 export interface AppState {
   firebaseApp: FirebaseApp | null;
@@ -29,13 +30,15 @@ export interface AppState {
   productToBeAdded: ProductModel | null;
   reloadProductsTable: boolean;
   reloadReportsTable: boolean;
-  activeReport: ReportModel | null;
+  activeInventoryReport: InventoryReport | null;
+  activePackagesReport: PacakagesReport | null;
   quantityModalModel: AddRemoveModalModel | null;
   inventoryEntryToAdd: ReportProductModel | null;
   inventoryEntryToSubstract: ReportProductModel | null;
   showNewReportModal: boolean;
   newReportName: string | null;
   packagesModalModel: AddRemoveModalModel | null;
+  gridSearchText: string | null;
 }
 
 const initialState: AppState = {
@@ -57,13 +60,15 @@ const initialState: AppState = {
   productToBeAdded: null,
   reloadProductsTable: false,
   reloadReportsTable: false,
-  activeReport: null,
+  activeInventoryReport: null,
   quantityModalModel: null,
   inventoryEntryToAdd: null,
   inventoryEntryToSubstract: null,
   showNewReportModal: false,
   newReportName: "",
-  packagesModalModel: null
+  packagesModalModel: null,
+  gridSearchText: null,
+  activePackagesReport: null
 };
 
 export const appSlice = createSlice({
@@ -124,7 +129,10 @@ export const appSlice = createSlice({
     },
     setPackagesModalModel: (state, action: PayloadAction<AddRemoveModalModel | null>) => {
       state.packagesModalModel = action.payload;
-    }
+    },
+    setGridSearchText: (state, action: PayloadAction<string | null>) => {
+      state.gridSearchText = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -189,21 +197,21 @@ export const appSlice = createSlice({
         state.showLoader = false;
       })
 
-      //reports
-      .addCase(getActiveReportsAsync.pending, (state) => {
+      //inventory - reports
+      .addCase(getActiveInventoryReportsAsync.pending, (state) => {
         state.showLoader = true;
       })
-      .addCase(getActiveReportsAsync.fulfilled, (state, action) => {
+      .addCase(getActiveInventoryReportsAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
-          const report = action.payload.docs[0].data() as ReportModel;
-          state.activeReport = report;
+          const report = action.payload.docs[0].data() as InventoryReport;
+          state.activeInventoryReport = report;
         } else {
-          state.activeReport = null
+          state.activeInventoryReport = null
         }
 
         state.showLoader = false;
       })
-      .addCase(getActiveReportsAsync.rejected, (state, action) => {
+      .addCase(getActiveInventoryReportsAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
       .addCase(createActiveReportAsync.pending, (state) => {
@@ -247,6 +255,23 @@ export const appSlice = createSlice({
         state.showLoader = false;
       })
 
+      //packages-reports  
+      .addCase(getActivePackagesReportsAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getActivePackagesReportsAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const report = action.payload.docs[0].data() as PacakagesReport;
+          state.activePackagesReport = report;
+        } else {
+          state.activePackagesReport = null
+        }
+
+        state.showLoader = false;
+      })
+      .addCase(getActivePackagesReportsAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
       .addCase(addPackagesAsync.pending, (state) => {
         state.showLoader = true;
       })
@@ -274,7 +299,7 @@ export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen,
   setAddProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
   setProductToBeAdded, setReloadProductsTable, setReloadReportsTable, setNewReportName,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
-  setPackagesModalModel } = appSlice.actions;
+  setPackagesModalModel, setGridSearchText } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -291,12 +316,14 @@ export const allProducts = (state: RootState) => state.appReducer.allProducts;
 export const productToBeAdded = (state: RootState) => state.appReducer.productToBeAdded;
 export const reloadProductsTable = (state: RootState) => state.appReducer.reloadProductsTable;
 export const reloadReportsTable = (state: RootState) => state.appReducer.reloadReportsTable;
-export const activeReport = (state: RootState) => state.appReducer.activeReport;
+export const activeInventoryReport = (state: RootState) => state.appReducer.activeInventoryReport;
+export const activePackagesReport = (state: RootState) => state.appReducer.activePackagesReport;
 export const quantityModalModel = (state: RootState) => state.appReducer.quantityModalModel;
 export const inventoryEntryToAdd = (state: RootState) => state.appReducer.inventoryEntryToAdd;
 export const inventoryEntryToSubstract = (state: RootState) => state.appReducer.inventoryEntryToSubstract;
 export const showNewReportModal = (state: RootState) => state.appReducer.showNewReportModal;
 export const newReportName = (state: RootState) => state.appReducer.newReportName;
 export const packagesModalModel = (state: RootState) => state.appReducer.packagesModalModel;
+export const gridSearchText = (state: RootState) => state.appReducer.gridSearchText;
 
 export default appSlice.reducer;

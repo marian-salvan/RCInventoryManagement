@@ -4,7 +4,7 @@ import { EditQuantityStateModel } from '../../models/forms.models';
 import { ReportProductModel } from '../../models/reports.models';
 import { fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, quantityModalModel, setQuantityModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { addQtyFromProductAsync, removeQtyFromProductAsync } from '../../thunks/reports.thunk';
+import { addQtyFromProductAsync, removeQtyFromProductAsync } from '../../thunks/inventory-reports.thunk';
 import  './QuantityModal.css';
 
 interface QuantityModalProps { }

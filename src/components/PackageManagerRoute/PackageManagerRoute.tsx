@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { ROLES } from '../../constants/roles.enum';
+import { ROLES } from '../../constants/roles.enums';
 import { loggedInUserMetadata, loggedUser, setFromLocation,  } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import'./PackageManagerRoute.css';

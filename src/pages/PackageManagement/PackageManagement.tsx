@@ -4,9 +4,9 @@ import { Alert, Button, Card, CardBody, CardSubtitle, CardTitle } from 'reactstr
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import EditPackagesModal from '../../components/EditPackagesModal/EditPackagesModal';
 import { addQuantityModalMessage, addQuantityModalTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
-import { activeReport, fireStoreDatabase, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
+import { activePackagesReport, fireStoreDatabase, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { getActiveReportsAsync } from '../../thunks/reports.thunk';
+import { getActivePackagesReportsAsync } from '../../thunks/packages-reports.thunk';
 import './PackageManagement.css';
 
 interface PackageManagementProps {}
@@ -14,18 +14,18 @@ interface PackageManagementProps {}
 const PackageManagement: FC<PackageManagementProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
-  const currentReport = useAppSelector(activeReport);
+  const currentReport = useAppSelector(activePackagesReport);
   const reload = useAppSelector(reloadReportsTable);
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getActiveReportsAsync(db));
+    dispatch(getActivePackagesReportsAsync(db));
   }, []);
 
   useEffect(() => {
     if (reload) {
       dispatch(setReloadReportsTable());
-      dispatch(getActiveReportsAsync(db));
+      dispatch(getActivePackagesReportsAsync(db));
     }
 
   }, [reload]);
@@ -52,7 +52,7 @@ const PackageManagement: FC<PackageManagementProps> = () => {
     }));
   }
 
-  if (currentReport?.inventory && currentReport.active && currentReport.inventory.length > 0) {
+  if (currentReport?.active) {
     return (
       <div className="products-container">
       <Card>

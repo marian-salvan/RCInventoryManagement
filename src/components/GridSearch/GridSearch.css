@@ -1,0 +1,9 @@
+.grid-search-container {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.grid-search-container .search-input {
+    width: 200px;
+}
