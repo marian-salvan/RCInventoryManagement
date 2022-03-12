@@ -1,7 +1,7 @@
 export const confirmationModalDefaultTitle = "Confirmă operația";
 export const confirmationModalDefaultMessage = "Doriți să efectuați această operație?";
 export const deleteProductModalTitle = "Confirmă ștergerea produsului";
-export const deleteProductModalMessage = "Doriți să ștergeți acest acest produs?";
+export const deleteProductModalMessage = "Doriți să ștergeți acest acest produs? El va fi șters și din inventarul curent.";
 export const closeCurrentInventoryTitle = "Închidere inventar";
 export const closeCurrentInventoryMessage = `Doriți să închideți inventarul curent? Nu veți
  mai putea face modificări asupra lui, dar veți putea vedea raportul rezultat în pagina de rapoarte.`;

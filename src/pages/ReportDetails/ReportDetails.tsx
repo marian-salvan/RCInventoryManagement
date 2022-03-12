@@ -2,11 +2,10 @@ import { FC, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, CardBody, CardSubtitle, CardTitle, Table } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
-import GridSearch from '../../components/GridSearch/GridSearch';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
-import { activeInventoryReport, fireStoreDatabase, selectedInventoryReport, selectedPackageReport} from '../../reducers/app.reducer';
+import { fireStoreDatabase, selectedInventoryReport, selectedPackageReport} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getInventoryReportsByUidAsync } from '../../thunks/inventory-reports.thunk';
 import { getPackagesReportsByUidAsync } from '../../thunks/packages-reports.thunk';
@@ -17,7 +16,6 @@ interface ReportDetailsProps {}
 const ReportDetails: FC<ReportDetailsProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
-  const currentInventoryReport = useAppSelector(activeInventoryReport);
   const inventoryReport = useAppSelector(selectedInventoryReport);
   const packagesReport = useAppSelector(selectedPackageReport);
 
@@ -40,8 +38,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
 
     var sheet2 = XLSX.utils.aoa_to_sheet([
-      ["Data de început", packagesReport?.fromDate.toDate().toLocaleDateString()],
-      ["Data de final", packagesReport?.toDate?.toDate().toLocaleDateString()],
+      ["Data de început", inventoryReport?.fromDate.toDate().toLocaleDateString()],
+      ["Data de final", inventoryReport?.toDate?.toDate().toLocaleDateString()],
       ["Total pachete", packagesReport?.packages.quantity],
       ["Cantitate pachete (KG)", packagesReport?.packages.totalPackages]
     ]);
@@ -61,9 +59,9 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
             </div>
           </CardTitle>
           <CardSubtitle>
-            <h6>Perioada: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
+            <h6>Perioada: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
             <h6>Nr total de pachete: {packagesReport?.packages.totalPackages} </h6>
-            <h6>Cantitate : {packagesReport?.packages.quantity} (KG) </h6>
+            <h6>Cantitate : {packagesReport?.packages.quantity} (KG)</h6>
           </CardSubtitle>
           <div className="table-container">
             <Table hover className="products-table" id="report-table">
@@ -87,7 +85,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
                     <th>{productTypesEngToRoMap.get(product.type)}</th>
                     <td>{product.unit}</td>
                     <td>{product.referencePrice}</td>
-                    <td>{product.quantity} ({product.unit})</td>
+                    <td>{product.quantity}</td>
                     <td>{product.totalPrice}</td>
                   </tr>
                   ))

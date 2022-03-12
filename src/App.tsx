@@ -9,6 +9,7 @@ import SideBar from './components/Sidebar/SideBar';
 import Content from './components/Content/Content';
 import Loader from './components/Loader/Loader';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import ErrorModal from './components/ErrorModal/ErrorModal';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +37,7 @@ const App = () => {
         <Content />
       </div>
       { loader && <Loader /> }
+      <ErrorModal />
     </BrowserRouter>
   );
 }

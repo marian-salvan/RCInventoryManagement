@@ -78,7 +78,7 @@ const Login: FC<LoginProps> = () => {
     <div className="login">
       <Card>
         <CardBody>
-          <CardTitle><h4>CRR Cluj - Management de donații</h4></CardTitle>
+          <CardTitle><h4>CRR Cluj - Gestiunea donațiilor</h4></CardTitle>
           <CardSubtitle><h5>Intră în cont</h5></CardSubtitle>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>

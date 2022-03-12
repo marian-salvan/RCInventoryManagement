@@ -9,3 +9,8 @@ export interface AddRemoveModalModel {
   buttonClass: string;
   addQty: boolean;
 }
+
+export interface ErrorModalModel {
+  showError: boolean;
+  errorMesage: string;
+}

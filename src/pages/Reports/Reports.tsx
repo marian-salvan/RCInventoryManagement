@@ -19,7 +19,7 @@ const Reports: FC<ReportsProps> = () => {
   }, [])
   
   const navigateToReportDetails = (uid: string) => {
-    navigate(`/reports/${uid}`);
+    navigate(`/reports/${uid}`, { replace: true });
   }
 
   return ( 
@@ -48,7 +48,7 @@ const Reports: FC<ReportsProps> = () => {
                     <td>{report.name}</td>
                     <td>{report.fromDate.toDate().toLocaleDateString()}</td>
                     <td>{report.toDate?.toDate().toLocaleDateString()}</td>
-                    <td onClick={() => navigateToReportDetails(report.uid)}><i className="bi bi-files" title="Vezi raportul"></i></td>
+                    <td onClick={() => navigateToReportDetails(report.uid)}><i className="colored bi bi-files" title="Vezi raportul"></i></td>
                   </tr>
                   ))
                 }

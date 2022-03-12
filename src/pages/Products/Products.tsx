@@ -1,11 +1,12 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import AddProductModal from '../../components/AddProductModal/AddProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
+import GridSearch from '../../components/GridSearch/GridSearch';
 import { deleteProductModalMessage, deleteProductModalTitle } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ProductModel } from '../../models/products.models';
-import { actionAccepted, allProducts, fireStoreDatabase, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
+import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
 import './Products.css';
@@ -19,12 +20,26 @@ const Products: FC<ProductsProps> = () => {
   const deleteConfirmation = useAppSelector(actionAccepted);
   const newProduct = useAppSelector(productToBeAdded);
   const reload = useAppSelector(reloadProductsTable);
+  const searchText = useAppSelector(gridSearchText);
 
   const [productToBeDeleted, setProductToBeDeleted] = useState<ProductModel | null>(null);
+  const [displayProducts, setDisplayProducts] = useState<ProductModel[]>([]);
 
   useEffect(() => {
     dispatch(getAllProductsAsync(db));
+
+    return () => {
+      dispatch(setGridSearchText(null));
+    }
   }, []);
+
+  useEffect(() => {
+    if (products) {
+      (searchText !== null) ? setDisplayProducts(products.filter(x => x.name.includes(searchText))) :
+                              setDisplayProducts(products); 
+    }
+
+  }, [products, searchText]);
 
   useEffect(() => {
     if (reload) {
@@ -78,6 +93,7 @@ const Products: FC<ProductsProps> = () => {
               <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button>
             </div>
           </CardTitle>  
+          <GridSearch />
           <div className="table-container">
             <Table hover className="products-table">
               <thead>
@@ -92,14 +108,14 @@ const Products: FC<ProductsProps> = () => {
               </thead>
               <tbody>
                 {
-                  products?.map((product, index) => (
+                  displayProducts?.map((product, index) => (
                   <tr key={product.name}>
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
                     <td>{productTypesEngToRoMap.get(product.type)}</td>
                     <td>{product.referencePrice}</td>
                     <td>{product.unit}</td>
-                    <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle" title="Șterge Produs"></i></td>
+                    <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produs"></i></td>
                   </tr>
                   ))
                 }
@@ -113,6 +129,5 @@ const Products: FC<ProductsProps> = () => {
     </div>
   );
 }
-
 
 export default Products;

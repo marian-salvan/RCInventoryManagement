@@ -18,7 +18,6 @@ const getActiveInventoryReportsAsync = createAsyncThunk(
 const getInactiveInventoryReportsAsync = createAsyncThunk(
     'app/getInactiveInventoryReportsAsync',
     async (db: Firestore | null) => {
-        debugger
         const productsRef = collection(db as Firestore, inventoryReportsCollection);
 
         return await getDocs(query(productsRef, where("active", "==", false)));
