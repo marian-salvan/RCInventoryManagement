@@ -15,6 +15,7 @@ const InventoryManagerRoute: FC<InventoryManagerRouteProps> = ({children}) => {
   const userMetadata = useAppSelector(loggedInUserMetadata);
   const location = useLocation();
 
+  debugger;
   dispatch(setFromLocation(location.pathname));
 
   if (!user) {

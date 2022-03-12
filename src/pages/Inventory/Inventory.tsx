@@ -141,36 +141,38 @@ const Inventory: FC<InventoryProps> = () => {
             </CardTitle>
             <CardSubtitle><h6>Perioada: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
             <GridSearch />
-            <Table hover className="products-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Nume produs</th>
-                  <th>Unitate de măsură</th>
-                  <th>Preț de referință</th>
-                  <th>Cantitate curentă</th>
-                  <th>Preț total</th>
-                  <th>Șterge cantitate</th>
-                  <th>Adaugă cantitate</th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  displayInventory.map((product, index) => (
-                  <tr key={product.name}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{product.name}</td>
-                    <td>{product.unit}</td>
-                    <td>{product.referencePrice}</td>
-                    <td>{product.quantity} ({product.unit})</td>
-                    <td>{product.totalPrice}</td>
-                    <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
-                    <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
+            <div className="table-container">
+              <Table hover className="products-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nume produs</th>
+                    <th>Unitate de măsură</th>
+                    <th>Preț de referință</th>
+                    <th>Cantitate curentă</th>
+                    <th>Preț total</th>
+                    <th>Șterge cantitate</th>
+                    <th>Adaugă cantitate</th>
                   </tr>
-                  ))
-                }
-              </tbody>
-            </Table> 
+                </thead>
+                <tbody>
+                  {
+                    displayInventory.map((product, index) => (
+                    <tr key={product.name}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{product.name}</td>
+                      <td>{product.unit}</td>
+                      <td>{product.referencePrice}</td>
+                      <td>{product.quantity} ({product.unit})</td>
+                      <td>{product.totalPrice}</td>
+                      <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
+                      <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
+                    </tr>
+                    ))
+                  }
+                </tbody>
+              </Table> 
+            </div>
           </CardBody>
         </Card>
         <QuantityModal/>

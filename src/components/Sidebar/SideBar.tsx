@@ -1,4 +1,4 @@
-import { NavItem, NavLink, Nav, Button } from "reactstrap";
+import { NavItem, NavLink, Nav } from "reactstrap";
 import classNames from "classnames";
 import { Link, useLocation } from "react-router-dom";
 import './SideBar.css';
@@ -25,7 +25,7 @@ const SideBar = () => {
   }
 
   const checkActiveRoute = (route: string): boolean => {
-    return route === location.pathname;
+    return location.pathname.includes(route);
   }
 
   return (

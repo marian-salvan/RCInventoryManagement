@@ -17,6 +17,10 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({children}) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  if (!userMetadata) {
+    return <Navigate to="/access-denied" replace />;
+  }
+
   return children;
 }
 

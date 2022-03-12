@@ -10,9 +10,9 @@ import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
-import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
+import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync, getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
-import { addPackagesAsync, getActivePackagesReportsAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
+import { addPackagesAsync, getActivePackagesReportsAsync, getPackagesReportsByUidAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
 
 export interface AppState {
   firebaseApp: FirebaseApp | null;
@@ -39,6 +39,9 @@ export interface AppState {
   newReportName: string | null;
   packagesModalModel: AddRemoveModalModel | null;
   gridSearchText: string | null;
+  inactiveInventoryReports: InventoryReport[] | null;
+  selectedInventoryReport: InventoryReport | null;
+  selectedPackageReport: PacakagesReport | null;
 }
 
 const initialState: AppState = {
@@ -68,7 +71,10 @@ const initialState: AppState = {
   newReportName: "",
   packagesModalModel: null,
   gridSearchText: null,
-  activePackagesReport: null
+  activePackagesReport: null,
+  inactiveInventoryReports: null,
+  selectedInventoryReport: null,
+  selectedPackageReport:  null,
 };
 
 export const appSlice = createSlice({
@@ -254,6 +260,41 @@ export const appSlice = createSlice({
       .addCase(closeCurrentReportAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
+      .addCase(getInactiveInventoryReportsAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getInactiveInventoryReportsAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const reports: InventoryReport[] = [];
+          
+          action.payload.docs.forEach(doc => {
+            reports.push(doc.data() as InventoryReport);
+          });
+
+          state.inactiveInventoryReports = reports;
+        } else {
+          state.inactiveInventoryReports = null
+        }
+        state.showLoader = false;
+      })
+      .addCase(getInactiveInventoryReportsAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
+      .addCase(getInventoryReportsByUidAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getInventoryReportsByUidAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const report = action.payload.docs[0].data() as InventoryReport;
+          state.selectedInventoryReport = report;
+        } else {
+          state.selectedInventoryReport = null
+        }
+        state.showLoader = false;
+      })
+      .addCase(getInventoryReportsByUidAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
 
       //packages-reports  
       .addCase(getActivePackagesReportsAsync.pending, (state) => {
@@ -292,6 +333,21 @@ export const appSlice = createSlice({
       .addCase(removePackagesAsync.rejected, (state, action) => {
         state.showLoader = false;
       })
+      .addCase(getPackagesReportsByUidAsync.pending, (state) => {
+        state.showLoader = true;
+      })
+      .addCase(getPackagesReportsByUidAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const report = action.payload.docs[0].data() as PacakagesReport;
+          state.selectedPackageReport = report;
+        } else {
+          state.selectedPackageReport = null
+        }
+        state.showLoader = false;
+      })
+      .addCase(getPackagesReportsByUidAsync.rejected, (state, action) => {
+        state.showLoader = false;
+      })
   },
 });
 
@@ -325,5 +381,8 @@ export const showNewReportModal = (state: RootState) => state.appReducer.showNew
 export const newReportName = (state: RootState) => state.appReducer.newReportName;
 export const packagesModalModel = (state: RootState) => state.appReducer.packagesModalModel;
 export const gridSearchText = (state: RootState) => state.appReducer.gridSearchText;
+export const inactiveInventoryReports = (state: RootState) => state.appReducer.inactiveInventoryReports;
+export const selectedInventoryReport = (state: RootState) => state.appReducer.selectedInventoryReport;
+export const selectedPackageReport = (state: RootState) => state.appReducer.selectedPackageReport;
 
 export default appSlice.reducer;

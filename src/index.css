@@ -15,3 +15,8 @@ code {
 .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
   background-color: #6d7fcc !important;
 }
+
+.table-container {
+  height: 600px;
+  overflow-y: scroll;
+}

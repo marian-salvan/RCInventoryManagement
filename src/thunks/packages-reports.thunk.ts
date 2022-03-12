@@ -14,6 +14,16 @@ const getActivePackagesReportsAsync = createAsyncThunk(
     }
 );
 
+const getPackagesReportsByUidAsync = createAsyncThunk(
+    'app/getPackagesReportsByUidAsync',
+    async ({db, uid}: {db: Firestore | null, uid: string}) => {
+        const productsRef = collection(db as Firestore, packagesReportsCollection);
+
+        return await getDocs(query(productsRef, where("uid", "==", uid)));
+    }
+);
+
+
 const addPackagesAsync = createAsyncThunk(
     'app/addPackagesAsync',
     async ({db, packageReport}: {db: Firestore | null, packageReport: ReportPackageModel}) => {
@@ -66,5 +76,6 @@ const removePackagesAsync = createAsyncThunk(
 export {
     getActivePackagesReportsAsync,
     addPackagesAsync,
-    removePackagesAsync
+    removePackagesAsync,
+    getPackagesReportsByUidAsync
 }

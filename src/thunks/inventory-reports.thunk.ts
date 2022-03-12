@@ -7,11 +7,30 @@ const inventoryReportsCollection = "inventory-reports";
 const packagesReportsCollection = "packages-reports";
 
 const getActiveInventoryReportsAsync = createAsyncThunk(
-    'app/getActiveReportAsync',
+    'app/getActiveInventoryReportsAsync',
     async (db: Firestore | null) => {
         const productsRef = collection(db as Firestore, inventoryReportsCollection);
 
         return await getDocs(query(productsRef, where("active", "==", true)));
+    }
+);
+
+const getInactiveInventoryReportsAsync = createAsyncThunk(
+    'app/getInactiveInventoryReportsAsync',
+    async (db: Firestore | null) => {
+        debugger
+        const productsRef = collection(db as Firestore, inventoryReportsCollection);
+
+        return await getDocs(query(productsRef, where("active", "==", false)));
+    }
+);
+
+const getInventoryReportsByUidAsync = createAsyncThunk(
+    'app/getInventoryReportsByUidAsync',
+    async ({db, uid}: {db: Firestore | null, uid: string}) => {
+        const productsRef = collection(db as Firestore, inventoryReportsCollection);
+
+        return await getDocs(query(productsRef, where("uid", "==", uid)));
     }
 );
 
@@ -137,5 +156,7 @@ export {
     createActiveReportAsync, 
     addQtyFromProductAsync, 
     removeQtyFromProductAsync,
-    closeCurrentReportAsync
+    closeCurrentReportAsync,
+    getInactiveInventoryReportsAsync,
+    getInventoryReportsByUidAsync
 };

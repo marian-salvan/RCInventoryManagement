@@ -78,32 +78,34 @@ const Products: FC<ProductsProps> = () => {
               <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button>
             </div>
           </CardTitle>  
-          <Table hover className="products-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nume produs</th>
-                <th>Categorie</th>
-                <th>Preț de referință</th>
-                <th>Unitate de măsură</th>
-                <th>Șterge Produs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                products?.map((product, index) => (
-                <tr key={product.name}>
-                  <th scope="row">{index + 1}</th>
-                  <td>{product.name}</td>
-                  <td>{productTypesEngToRoMap.get(product.type)}</td>
-                  <td>{product.referencePrice}</td>
-                  <td>{product.unit}</td>
-                  <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle" title="Șterge Produs"></i></td>
+          <div className="table-container">
+            <Table hover className="products-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nume produs</th>
+                  <th>Categorie</th>
+                  <th>Preț de referință</th>
+                  <th>Unitate de măsură</th>
+                  <th>Șterge Produs</th>
                 </tr>
-                ))
-              }
-            </tbody>
-          </Table> 
+              </thead>
+              <tbody>
+                {
+                  products?.map((product, index) => (
+                  <tr key={product.name}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{product.name}</td>
+                    <td>{productTypesEngToRoMap.get(product.type)}</td>
+                    <td>{product.referencePrice}</td>
+                    <td>{product.unit}</td>
+                    <td onClick={() => deleteProduct(product)}><i className="bi bi-dash-circle" title="Șterge Produs"></i></td>
+                  </tr>
+                  ))
+                }
+              </tbody>
+            </Table> 
+          </div> 
         </CardBody>
       </Card>
       <AddProductModal />

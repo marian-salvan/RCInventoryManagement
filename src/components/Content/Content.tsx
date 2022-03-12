@@ -1,7 +1,6 @@
-import { FC, useEffect } from "react";
 import classNames from "classnames";
-import { Button, Container } from "reactstrap";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Container } from "reactstrap";
+import { Navigate, Route, Routes, } from "react-router-dom";
 import './Content.css';
 import Products from "../../pages/Products/Products";
 import PackageManagement from "../../pages/PackageManagement/PackageManagement";
@@ -15,6 +14,7 @@ import AccessDenied from "../../pages/AccessDenied/AccessDenied";
 import AdminRoute from "../AdminRoute/AdminRoute";
 import InventoryManagerRoute from "../InventoryManagerRoute/InventoryManagerRoute";
 import PackageManagerRoute from "../PackageManagerRoute/PackageManagerRoute";
+import ReportDetails from "../../pages/ReportDetails/ReportDetails";
 
 const Content = () => {
   const isOpen = useAppSelector(sideBarIsOpen);
@@ -26,27 +26,12 @@ const Content = () => {
     >
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/products" element={
-          <ProtectedRoute>
-            <Products />
-          </ProtectedRoute>
-          }/>
-        <Route path="/inventory" element={
-          <InventoryManagerRoute>
-              <Inventory />
-          </InventoryManagerRoute>
-          }/>
-        <Route path="/package-management"
-         element={
-         <PackageManagerRoute> 
-           <PackageManagement />
-         </PackageManagerRoute> 
-         } />
-        <Route path="/reports" element={
-            <AdminRoute>
-                <Reports />
-            </AdminRoute>
-          }/>
+        <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>}/>
+        <Route path="/inventory" element={<InventoryManagerRoute><Inventory /></InventoryManagerRoute>}/>
+        {/* <Route path="/package-management" element={ <PackageManagerRoute><PackageManagement /></PackageManagerRoute> } /> */}
+        <Route path="/package-management" element={ <InventoryManagerRoute><PackageManagement /></InventoryManagerRoute> } />
+        <Route path="/reports" element={ <AdminRoute><Reports /></AdminRoute>} />
+        <Route path="/reports/:reportId" element={<AdminRoute><ReportDetails /></AdminRoute>} />
         <Route path="/access-denied" element={<AccessDenied />}></Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

@@ -5,7 +5,7 @@ import { ProductModel } from "../models/products.models";
 import { InventoryReport } from "../models/reports.models";
 
 const productsCollection = "products";
-const reportsCollection = "reports";
+const reportsCollection = "inventory-reports";
 
 const getAllProductsAsync = createAsyncThunk(
     'app/getAllProductsAsync',
@@ -61,7 +61,6 @@ const deleteProductAsync = createAsyncThunk(
 
             const reportsRef = collection(db as Firestore, reportsCollection)
             const reportsQuerySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
-            debugger;
 
             if (reportsQuerySnapshot.docs.length === 1) {
                
