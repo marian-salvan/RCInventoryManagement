@@ -53,8 +53,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     var sheet2 = XLSX.utils.aoa_to_sheet([
       ["Data de început", inventoryReport?.fromDate.toDate().toLocaleDateString()],
       ["Data de final", inventoryReport?.toDate?.toDate().toLocaleDateString()],
-      ["Total pachete", packagesReport?.packages.quantity],
-      ["Cantitate pachete (KG)", packagesReport?.packages.totalPackages]
+      ["Total pachete", packagesReport?.packages.totalPackages],
+      ["Cantitate pachete (KG)", packagesReport?.packages.quantity]
     ]);
     XLSX.utils.book_append_sheet(workbook, sheet2, "Sheet2");
 
@@ -73,8 +73,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
           </CardTitle>
           <CardSubtitle>
             <h6>Perioada: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
-            <h6>Nr total de pachete: {packagesReport?.packages.totalPackages} </h6>
-            <h6>Cantitate : {packagesReport?.packages.quantity} (KG)</h6>
+            <h6>Nr total de pachete: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
+            <h6>Cantitate : {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
           </CardSubtitle>
           <div className="table-container">
             <Table hover className="products-table" id="report-table">
@@ -98,8 +98,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
                     <th>{product.type}</th>
                     <td>{product.unit}</td>
                     <td>{product.referencePrice}</td>
-                    <td>{product.quantity}</td>
-                    <td>{product.totalPrice}</td>
+                    <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)}</td>
+                    <td>{(Math.round(product.totalPrice * 100) / 100).toFixed(2)}</td>
                   </tr>
                   ))
                 }

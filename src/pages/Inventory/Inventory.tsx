@@ -173,9 +173,9 @@ const Inventory: FC<InventoryProps> = () => {
                       <th scope="row">{index + 1}</th>
                       <td>{product.name}</td>
                       <td>{product.unit}</td>
-                      { userHasAccess() && <td>{product.referencePrice}</td> }
-                      <td>{product.quantity} ({product.unit})</td>
-                      { userHasAccess() && <td>{product.totalPrice}</td> }
+                      { userHasAccess() && <td>{product.referencePrice }</td> }
+                      <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)} ({product.unit})</td>
+                      { userHasAccess() && <td>{(Math.round(product.totalPrice * 100) / 100).toFixed(2)}</td> }
                       <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
                       <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
                     </tr>

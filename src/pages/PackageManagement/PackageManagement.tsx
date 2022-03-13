@@ -74,8 +74,8 @@ const PackageManagement: FC<PackageManagementProps> = () => {
           <h6>Inventar curent: {currentReport.name}</h6>
         </CardSubtitle>  
         <Alert color="secondary" className="total-container">
-          <h6 className="total-container-item">Totalul de pachete: {currentReport.packages.totalPackages}</h6>
-          <h6 className="total-container-item">Cantitatea totală: {currentReport.packages.quantity} (KG)</h6>
+          <h6 className="total-container-item">Totalul de pachete: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
+          <h6 className="total-container-item">Cantitatea totală: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
         </Alert>
       </CardBody>
       </Card>
