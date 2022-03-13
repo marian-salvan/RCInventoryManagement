@@ -7,12 +7,13 @@ import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { addQuantityModalMessage, addQuantityModalTitle, closeCurrentInventoryMessage, closeCurrentInventoryTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { ReportProductModel } from '../../models/reports.models';
-import { actionAccepted, activeInventoryReport, allProducts, fireStoreDatabase, gridSearchText, newReportName, reloadReportsTable, setActionAccepted, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal, setQuantityModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
+import { actionAccepted, activeInventoryReport, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getAllProductsAsync } from '../../thunks/products.thunk';
 import { closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync } from '../../thunks/inventory-reports.thunk';
 import  './Inventory.css';
 import { defaulPackagesReportModel, defaultInventoryReportModel } from '../../constants/default.configs';
+import { ROLES } from '../../constants/roles.enums';
 
 interface InventoryProps {}
 
@@ -25,6 +26,7 @@ const Inventory: FC<InventoryProps> = () => {
   const inventoryConfirmation = useAppSelector(actionAccepted);
   const reportName = useAppSelector(newReportName);
   const searchText = useAppSelector(gridSearchText);
+  const userMetadata = useAppSelector(loggedInUserMetadata);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
 
@@ -59,12 +61,14 @@ const Inventory: FC<InventoryProps> = () => {
   }, [inventoryConfirmation]);
   
   useEffect(() => {
-    if (availableProducts && availableProducts.length >= 0 && reportName) {
+    if (reportName) {
       let inventory: ReportProductModel[] = [];
       const { v4: uuidv4 } = require('uuid');
       const uid =  uuidv4();
 
-      availableProducts.map(p => {
+      debugger;
+
+      availableProducts?.map(p => {
         let reportProductModel: ReportProductModel = {
           uid: p.uid,
           name: p.name,
@@ -89,9 +93,9 @@ const Inventory: FC<InventoryProps> = () => {
       let packagesReport = defaulPackagesReportModel;
 
       dispatch(createActiveReportAsync({db, inventoryReport, packagesReport}));
-      
+      dispatch(setNewReportName(null));      
     }
-  }, [availableProducts, reportName])
+  }, [reportName])
 
   const openAddQtyModal = (reportProduct: ReportProductModel) => {
     dispatch(setQuantityModalModel({
@@ -128,6 +132,10 @@ const Inventory: FC<InventoryProps> = () => {
     dispatch(setNewReportModal());
   }
 
+  const userHasAccess = (): boolean => {
+    return userMetadata?.role == ROLES.ADMIN;
+  } 
+
   if (currentInventoryReport?.inventory && currentInventoryReport.active && currentInventoryReport.inventory.length >= 0) {
     return ( 
       <div className="products-container">
@@ -135,9 +143,12 @@ const Inventory: FC<InventoryProps> = () => {
           <CardBody>
             <CardTitle className="card-title">
               <h4>Inventar curent: {currentInventoryReport.name}</h4>
-              <div className="button-container">
+              {
+                userHasAccess() &&
+                <div className="button-container">
                 <Button className="add-button" color="primary" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
-              </div>
+                </div>
+              }
             </CardTitle>
             <CardSubtitle><h6>Perioada: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
             <GridSearch />
@@ -148,9 +159,9 @@ const Inventory: FC<InventoryProps> = () => {
                     <th>#</th>
                     <th>Nume produs</th>
                     <th>Unitate de măsură</th>
-                    <th>Preț de referință</th>
+                    { userHasAccess() && <th>Preț de referință</th> }
                     <th>Cantitate curentă</th>
-                    <th>Preț total</th>
+                    { userHasAccess() && <th>Preț total</th> }
                     <th>Șterge cantitate</th>
                     <th>Adaugă cantitate</th>
                   </tr>
@@ -162,9 +173,9 @@ const Inventory: FC<InventoryProps> = () => {
                       <th scope="row">{index + 1}</th>
                       <td>{product.name}</td>
                       <td>{product.unit}</td>
-                      <td>{product.referencePrice}</td>
+                      { userHasAccess() && <td>{product.referencePrice}</td> }
                       <td>{product.quantity} ({product.unit})</td>
-                      <td>{product.totalPrice}</td>
+                      { userHasAccess() && <td>{product.totalPrice}</td> }
                       <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
                       <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
                     </tr>
@@ -185,12 +196,18 @@ const Inventory: FC<InventoryProps> = () => {
     <div className="products-container">
       <Card>
       <CardBody>
-        <CardTitle className="card-title">
-          <h4>Nu există un inventar activ. Doriți să creați unul?</h4>
-          <div className="button-container">
-            <Button className="add-button" color="primary" onClick={() => showCreateNewReportModal()}>Creați inventar nou</Button>
-          </div>
-        </CardTitle>   
+        { userHasAccess() ?  
+          <CardTitle className="card-title">
+            <h4>Nu există un inventar activ. Doriți să creați unul?</h4>
+            <div className="button-container">
+              <Button className="add-button" color="primary" onClick={() => showCreateNewReportModal()}>Creați inventar nou</Button>
+            </div>
+          </CardTitle>   
+        : 
+          <CardTitle className="card-title">
+            <h4>Nu există un inventar activ. Contactați administratorul pentru crearea lui.</h4>
+          </CardTitle>   
+        }
       </CardBody>
       </Card>
       <ConfirmationModal />

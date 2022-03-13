@@ -48,7 +48,7 @@ const Reports: FC<ReportsProps> = () => {
                     <td>{report.name}</td>
                     <td>{report.fromDate.toDate().toLocaleDateString()}</td>
                     <td>{report.toDate?.toDate().toLocaleDateString()}</td>
-                    <td onClick={() => navigateToReportDetails(report.uid)}><i className="colored bi bi-files" title="Vezi raportul"></i></td>
+                    <td onClick={() => navigateToReportDetails(report.uid)}><i className="bi bi-file" title="Vezi raportul"></i></td>
                   </tr>
                   ))
                 }

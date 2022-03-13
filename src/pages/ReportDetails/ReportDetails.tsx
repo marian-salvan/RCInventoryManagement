@@ -1,10 +1,11 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, CardBody, CardSubtitle, CardTitle, Table } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
+import { ReportProductModel } from '../../models/reports.models';
 import { fireStoreDatabase, selectedInventoryReport, selectedPackageReport} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getInventoryReportsByUidAsync } from '../../thunks/inventory-reports.thunk';
@@ -19,6 +20,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   const inventoryReport = useAppSelector(selectedInventoryReport);
   const packagesReport = useAppSelector(selectedPackageReport);
 
+  const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
+
   const { reportId } = useParams();
 
   useEffect(() => {
@@ -29,6 +32,16 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
       dispatch(getPackagesReportsByUidAsync({db, uid}));
     }
   }, [reportId])
+
+  useEffect(() => {
+    if (inventoryReport) {
+      const reports = inventoryReport.inventory.map(product => {
+        return {...product, type: productTypesEngToRoMap.get(product.type) as string};
+      });
+
+      setDisplayInventory(reports.sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0)));
+    }
+  }, [inventoryReport])
   
   const downloadReport = () => {
     var XLSX = require("xlsx");
@@ -78,11 +91,11 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
               </thead>
               <tbody>
                 {
-                  inventoryReport?.inventory.map((product, index) => (
+                  displayInventory.map((product, index) => (
                   <tr key={product.name}>
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
-                    <th>{productTypesEngToRoMap.get(product.type)}</th>
+                    <th>{product.type}</th>
                     <td>{product.unit}</td>
                     <td>{product.referencePrice}</td>
                     <td>{product.quantity}</td>

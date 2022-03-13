@@ -5,8 +5,9 @@ import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationMo
 import GridSearch from '../../components/GridSearch/GridSearch';
 import { deleteProductModalMessage, deleteProductModalTitle } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
+import { ROLES } from '../../constants/roles.enums';
 import { ProductModel } from '../../models/products.models';
-import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
+import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
 import './Products.css';
@@ -21,6 +22,7 @@ const Products: FC<ProductsProps> = () => {
   const newProduct = useAppSelector(productToBeAdded);
   const reload = useAppSelector(reloadProductsTable);
   const searchText = useAppSelector(gridSearchText);
+  const userMetadata = useAppSelector(loggedInUserMetadata);
 
   const [productToBeDeleted, setProductToBeDeleted] = useState<ProductModel | null>(null);
   const [displayProducts, setDisplayProducts] = useState<ProductModel[]>([]);
@@ -83,6 +85,10 @@ const Products: FC<ProductsProps> = () => {
     dispatch(setAddProductModal());
   }
 
+  const userHasAccess = (): boolean => {
+    return userMetadata?.role == ROLES.ADMIN;
+  } 
+
   return ( 
     <div className="products-container">
        <Card>
@@ -90,7 +96,7 @@ const Products: FC<ProductsProps> = () => {
           <CardTitle className="card-title">
             <h4>Lista de produse</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button>
+            { userHasAccess() && <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button> }
             </div>
           </CardTitle>  
           <GridSearch />
@@ -101,9 +107,9 @@ const Products: FC<ProductsProps> = () => {
                   <th>#</th>
                   <th>Nume produs</th>
                   <th>Categorie</th>
-                  <th>Preț de referință</th>
+                  { userHasAccess() && <th>Preț de referință</th> }
                   <th>Unitate de măsură</th>
-                  <th>Șterge Produs</th>
+                  { userHasAccess() && <th>Șterge Produs</th> }
                 </tr>
               </thead>
               <tbody>
@@ -113,9 +119,9 @@ const Products: FC<ProductsProps> = () => {
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
                     <td>{productTypesEngToRoMap.get(product.type)}</td>
-                    <td>{product.referencePrice}</td>
+                    { userHasAccess() && <td>{product.referencePrice}</td> }
                     <td>{product.unit}</td>
-                    <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produs"></i></td>
+                    { userHasAccess() &&  <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produs"></i></td> }
                   </tr>
                   ))
                 }

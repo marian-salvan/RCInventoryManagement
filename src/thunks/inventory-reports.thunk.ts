@@ -43,6 +43,8 @@ const createActiveReportAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(invReportsRef, where("active", "==", true)));
             const querrySnapshotName = await getDocs(query(invReportsRef, where("name", "==", inventoryReport.name)));
 
+
+            debugger;
             if (querrySnapshot.docs.length > 0) {
                 return Promise.reject("Există deja un inventar activ");
             }

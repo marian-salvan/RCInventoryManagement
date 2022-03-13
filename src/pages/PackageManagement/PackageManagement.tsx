@@ -4,7 +4,8 @@ import { Alert, Button, Card, CardBody, CardSubtitle, CardTitle } from 'reactstr
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import EditPackagesModal from '../../components/EditPackagesModal/EditPackagesModal';
 import { addQuantityModalMessage, addQuantityModalTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
-import { activePackagesReport, fireStoreDatabase, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
+import { ROLES } from '../../constants/roles.enums';
+import { activePackagesReport, fireStoreDatabase, loggedInUserMetadata, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getActivePackagesReportsAsync } from '../../thunks/packages-reports.thunk';
 import './PackageManagement.css';
@@ -17,6 +18,7 @@ const PackageManagement: FC<PackageManagementProps> = () => {
   const currentReport = useAppSelector(activePackagesReport);
   const reload = useAppSelector(reloadReportsTable);
   const navigate = useNavigate();
+  const userMetadata = useAppSelector(loggedInUserMetadata);
 
   useEffect(() => {
     dispatch(getActivePackagesReportsAsync(db));
@@ -52,6 +54,10 @@ const PackageManagement: FC<PackageManagementProps> = () => {
     }));
   }
 
+  const userHasAccess = (): boolean => {
+    return userMetadata?.role == ROLES.ADMIN;
+  } 
+
   if (currentReport?.active) {
     return (
       <div className="products-container">
@@ -82,12 +88,22 @@ const PackageManagement: FC<PackageManagementProps> = () => {
     <div className="products-container">
     <Card>
     <CardBody>
-      <CardTitle className="card-title">
-        <h4>Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?</h4>
-        <div className="button-container">
-          <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>Creați inventar nou</Button>
-        </div>
-      </CardTitle>   
+      {
+        userHasAccess() ? 
+          <CardTitle className="card-title">
+            <h4>Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?</h4>
+            <div className="button-container">
+              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>Creați inventar nou</Button>
+            </div>
+          </CardTitle>   
+        :
+          <CardTitle className="card-title">
+            <h4>Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui.</h4>
+            <div className="button-container">
+              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>Mergeți la inventar</Button>
+            </div>
+        </CardTitle>   
+      }    
     </CardBody>
     </Card>
     <ConfirmationModal />

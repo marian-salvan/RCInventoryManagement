@@ -1,11 +1,18 @@
 import { FC } from 'react';
+import { Card, CardBody, CardTitle } from 'reactstrap';
 import './AccessDenied.css';
 
 interface AccessDeniedProps {}
 
 const AccessDenied: FC<AccessDeniedProps> = () => (
-  <div>
-    <span>Nu ai access la această pagină</span>
+  <div className="products-container">
+    <Card>
+    <CardBody>
+      <CardTitle className="card-title">
+        <h4>Nu ai acces la această pagină</h4>
+      </CardTitle>   
+    </CardBody>
+    </Card>
   </div>
 );
 
