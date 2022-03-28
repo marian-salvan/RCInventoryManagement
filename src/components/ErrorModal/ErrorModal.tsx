@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { genericErrorMessage } from '../../constants/messages.constants';
+import { appErrors } from '../../constants/messages.constants';
 import { errorModalModel, setErrorModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';import  './ErrorModal.css';
 
@@ -12,7 +12,7 @@ const ErrorModal: FC<ErrorModalProps> = () =>
   const modalModel = useAppSelector(errorModalModel);
 
   const toggle = () => {
-    dispatch(setErrorModalModel({showError: false, errorMesage: genericErrorMessage}));
+    dispatch(setErrorModalModel({showError: false, errorMesage: appErrors.get("genericErrorMessage") as string}));
   }
 
   const confirm = () => {

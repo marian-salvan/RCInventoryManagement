@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, CardBody, CardSubtitle, CardTitle } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import EditPackagesModal from '../../components/EditPackagesModal/EditPackagesModal';
-import { addQuantityModalMessage, addQuantityModalTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
+import { appMessages } from '../../constants/messages.constants';
 import { ROLES } from '../../constants/roles.enums';
 import { activePackagesReport, fireStoreDatabase, loggedInUserMetadata, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -38,8 +38,8 @@ const PackageManagement: FC<PackageManagementProps> = () => {
 
   const openRemovePackagesModal = () => {
     dispatch(setPackagesModalModel({
-      modalTitle: removeQuantityModalTitle,
-      buttonText: removeQuantityModalMessage,
+      modalTitle: appMessages.get("removeQuantityModalTitle") as string ,
+      buttonText: appMessages.get("removeQuantityModalMessage") as string ,
       buttonClass: "danger",
       addQty: false
     }));
@@ -47,8 +47,8 @@ const PackageManagement: FC<PackageManagementProps> = () => {
   
   const openAddPackagesModal = () => {
     dispatch(setPackagesModalModel({
-      modalTitle: addQuantityModalTitle,
-      buttonText: addQuantityModalMessage,
+      modalTitle: appMessages.get("addQuantityModalTitle") as string,
+      buttonText: appMessages.get("addQuantityModalMessage") as string,
       buttonClass: "primary",
       addQty: true
     }));

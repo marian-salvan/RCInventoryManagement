@@ -3,7 +3,7 @@ import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import AddProductModal from '../../components/AddProductModal/AddProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import GridSearch from '../../components/GridSearch/GridSearch';
-import { deleteProductModalMessage, deleteProductModalTitle } from '../../constants/messages.constants';
+import { appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ROLES } from '../../constants/roles.enums';
 import { ProductModel } from '../../models/products.models';
@@ -73,8 +73,8 @@ const Products: FC<ProductsProps> = () => {
 
   const deleteProduct = (product: ProductModel) => {
     dispatch(setConfirmationModalModel({
-      title: deleteProductModalTitle,
-      message: deleteProductModalMessage
+      title: appMessages.get("deleteProductModalTitle") as string,
+      message: appMessages.get("deleteProductModalMessage") as string 
     }));
     dispatch(setConfirmationModal());
 

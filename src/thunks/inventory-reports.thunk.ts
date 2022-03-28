@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, doc, Firestore, getDocs, query, runTransaction, Timestamp, where } from "firebase/firestore";
-import { genericErrorMessage } from "../constants/messages.constants";
+import { appErrors } from "../constants/messages.constants";
 import { InventoryReport, PacakagesReport, ReportProductModel } from "../models/reports.models";
 
 const inventoryReportsCollection = "inventory-reports";
@@ -69,7 +69,7 @@ const addQtyFromProductAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
 
             if (querrySnapshot.docs.length !== 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             let docToBeUpdated = querrySnapshot.docs[0].data() as InventoryReport;
@@ -95,7 +95,7 @@ const removeQtyFromProductAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
 
             if (querrySnapshot.docs.length !== 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             let docToBeUpdated = querrySnapshot.docs[0].data() as InventoryReport;
@@ -128,7 +128,7 @@ const closeCurrentReportAsync = createAsyncThunk(
             const packagesQuerrySnapshot = await getDocs(query(packagesReportsRef, where("active", "==", true)));
 
             if (invenntoryQuerrySnapshot.docs.length !== 1 || packagesQuerrySnapshot.docs.length !== 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             let invDocToBeUpdated = invenntoryQuerrySnapshot.docs[0].data() as InventoryReport;

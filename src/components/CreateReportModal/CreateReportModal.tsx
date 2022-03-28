@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
-import { createCurrentInventoryMessage, createCurrentInventoryTitle } from '../../constants/messages.constants';
+import { appMessages } from '../../constants/messages.constants';
 import { NewReportStateModel } from '../../models/forms.models';
 import { fireStoreDatabase, showNewReportModal, setNewReportModal, setNewReportName } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -52,9 +52,9 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
   return (
     <div>
       <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>{createCurrentInventoryTitle}</ModalHeader>
+        <ModalHeader toggle={toggle}>{appMessages.get("createCurrentInventoryTitle")}</ModalHeader>
         <ModalBody>
-          <div>{createCurrentInventoryMessage}</div>
+          <div>{appMessages.get("createCurrentInventoryMessage")}</div>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
               <Label for="name">Nume inventar</Label>

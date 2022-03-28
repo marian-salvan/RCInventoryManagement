@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, Firestore, getDocs, query, runTransaction, where } from "firebase/firestore";
-import { genericErrorMessage } from "../constants/messages.constants";
+import { appErrors } from "../constants/messages.constants";
 import { PacakagesReport, ReportPackageModel } from "../models/reports.models";
 
 const packagesReportsCollection = "packages-reports";
@@ -32,7 +32,7 @@ const addPackagesAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
 
             if (querrySnapshot.docs.length !== 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             let docToBeUpdated = querrySnapshot.docs[0].data() as PacakagesReport;
@@ -53,7 +53,7 @@ const removePackagesAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
 
             if (querrySnapshot.docs.length !== 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             let docToBeUpdated = querrySnapshot.docs[0].data() as PacakagesReport;

@@ -4,7 +4,6 @@ import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationMo
 import CreateReportModal from '../../components/CreateReportModal/CreateReportModal';
 import GridSearch from '../../components/GridSearch/GridSearch';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
-import { addQuantityModalMessage, addQuantityModalTitle, closeCurrentInventoryMessage, closeCurrentInventoryTitle, removeQuantityModalMessage, removeQuantityModalTitle } from '../../constants/messages.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { ReportProductModel } from '../../models/reports.models';
 import { actionAccepted, activeInventoryReport, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
@@ -14,6 +13,7 @@ import { closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryRep
 import  './Inventory.css';
 import { defaulPackagesReportModel, defaultInventoryReportModel } from '../../constants/default.configs';
 import { ROLES } from '../../constants/roles.enums';
+import { appMessages } from '../../constants/messages.constants';
 
 interface InventoryProps {}
 
@@ -99,8 +99,8 @@ const Inventory: FC<InventoryProps> = () => {
 
   const openAddQtyModal = (reportProduct: ReportProductModel) => {
     dispatch(setQuantityModalModel({
-      modalTitle: addQuantityModalTitle,
-      buttonText: addQuantityModalMessage,
+      modalTitle: appMessages.get("addQuantityModalTitle") as string,
+      buttonText: appMessages.get("addQuantityModalMessage") as string,
       buttonClass: "primary",
       addQty: true
     }))
@@ -110,8 +110,8 @@ const Inventory: FC<InventoryProps> = () => {
 
   const openRemoveQtyModal = (reportProduct: ReportProductModel) => {
     dispatch(setQuantityModalModel({
-      modalTitle: removeQuantityModalTitle,
-      buttonText: removeQuantityModalMessage,
+      modalTitle: appMessages.get("removeQuantityModalTitle") as string,
+      buttonText: appMessages.get("removeQuantityModalMessage") as string,
       buttonClass: "danger",
       addQty: false
     }))
@@ -121,8 +121,8 @@ const Inventory: FC<InventoryProps> = () => {
 
   const showCloseConfirmationModal = () => {
     dispatch(setConfirmationModalModel({
-      title: closeCurrentInventoryTitle,
-      message: closeCurrentInventoryMessage
+      title: appMessages.get("closeCurrentInventoryTitle") as string,
+      message: appMessages.get("closeCurrentInventoryMessage") as string 
     }));
 
     dispatch(setConfirmationModal());  

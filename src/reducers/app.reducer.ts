@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
-import { confirmationModalDefaultMessage, confirmationModalDefaultTitle, genericErrorMessage } from '../constants/messages.constants';
 import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
 import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/reports.models';
@@ -13,74 +12,8 @@ import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../t
 import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync, getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 import { addPackagesAsync, getActivePackagesReportsAsync, getPackagesReportsByUidAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
-
-export interface AppState {
-  firebaseApp: FirebaseApp | null;
-  sideBarIsOpen: boolean;
-  fromLocation: string;
-  loggedUser: User | null;
-  showLoader: boolean;
-  database: Firestore | null;
-  loggedInUserMetadata: UserMetadataModel | null;
-  allProducts: ProductModel[] | null;
-  showAddProductModal: boolean;
-  showConfirmationModal: boolean;
-  confirmationModalModel: ConfirmationModalModel;
-  actionAccepted: boolean;
-  productToBeAdded: ProductModel | null;
-  reloadProductsTable: boolean;
-  reloadReportsTable: boolean;
-  activeInventoryReport: InventoryReport | null;
-  activePackagesReport: PacakagesReport | null;
-  quantityModalModel: AddRemoveModalModel | null;
-  inventoryEntryToAdd: ReportProductModel | null;
-  inventoryEntryToSubstract: ReportProductModel | null;
-  showNewReportModal: boolean;
-  newReportName: string | null;
-  packagesModalModel: AddRemoveModalModel | null;
-  gridSearchText: string | null;
-  inactiveInventoryReports: InventoryReport[] | null;
-  selectedInventoryReport: InventoryReport | null;
-  selectedPackageReport: PacakagesReport | null;
-  errorModalModel: ErrorModalModel;
-}
-
-const initialState: AppState = {
-  firebaseApp: null,
-  sideBarIsOpen: true,
-  fromLocation: "/products",
-  loggedUser: null,
-  showLoader: false,
-  database: null,
-  loggedInUserMetadata: null,
-  allProducts: null,
-  showAddProductModal: false,
-  showConfirmationModal: false,
-  confirmationModalModel: {
-    title: confirmationModalDefaultTitle,
-    message: confirmationModalDefaultMessage
-  },
-  actionAccepted: false,
-  productToBeAdded: null,
-  reloadProductsTable: false,
-  reloadReportsTable: false,
-  activeInventoryReport: null,
-  quantityModalModel: null,
-  inventoryEntryToAdd: null,
-  inventoryEntryToSubstract: null,
-  showNewReportModal: false,
-  newReportName: "",
-  packagesModalModel: null,
-  gridSearchText: null,
-  activePackagesReport: null,
-  inactiveInventoryReports: null,
-  selectedInventoryReport: null,
-  selectedPackageReport:  null,
-  errorModalModel: {
-    showError: false,
-    errorMesage: genericErrorMessage,
-  }
-};
+import { initialState } from './app.state';
+import { appErrors } from '../constants/messages.constants';
 
 export const appSlice = createSlice({
   name: 'app',
@@ -153,7 +86,7 @@ export const appSlice = createSlice({
       //users
       .addCase(signInUserAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(signInUserAsync.fulfilled, (state, action) => {
         state.showLoader = false;
@@ -161,11 +94,11 @@ export const appSlice = createSlice({
       .addCase(signInUserAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;                                                    
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;                                                    
       })  
       .addCase(signOutUserAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(signOutUserAsync.fulfilled, (state, action) => {
         state.showLoader = false;
@@ -175,11 +108,11 @@ export const appSlice = createSlice({
       .addCase(signOutUserAsync.rejected, (state, action) => {
         state.showLoader = true;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;     
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;     
       })
       .addCase(getLoggedInUserMetaDataAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getLoggedInUserMetaDataAsync.fulfilled, (state, action) => {
         state.loggedInUserMetadata = action.payload.docs[0].data() as UserMetadataModel;
@@ -188,13 +121,13 @@ export const appSlice = createSlice({
       .addCase(getLoggedInUserMetaDataAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;     
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;     
       })
 
       //products
       .addCase(getAllProductsAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getAllProductsAsync.fulfilled, (state, action) => {
         state.allProducts = action.payload.docs.map(doc => doc.data() as ProductModel);
@@ -203,11 +136,11 @@ export const appSlice = createSlice({
       .addCase(getAllProductsAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;    
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;    
       })
       .addCase(createProductAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(createProductAsync.fulfilled, (state, action) => {
         state.reloadProductsTable = true;
@@ -216,12 +149,11 @@ export const appSlice = createSlice({
       .addCase(createProductAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
-        debugger;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(deleteProductAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(deleteProductAsync.fulfilled, (state, action) => {
         state.reloadProductsTable = true;
@@ -230,13 +162,13 @@ export const appSlice = createSlice({
       .addCase(deleteProductAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
 
       //inventory - reports
       .addCase(getActiveInventoryReportsAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getActiveInventoryReportsAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
@@ -251,11 +183,11 @@ export const appSlice = createSlice({
       .addCase(getActiveInventoryReportsAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(createActiveReportAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(createActiveReportAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -264,11 +196,11 @@ export const appSlice = createSlice({
       .addCase(createActiveReportAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(addQtyFromProductAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(addQtyFromProductAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -277,11 +209,11 @@ export const appSlice = createSlice({
       .addCase(addQtyFromProductAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(removeQtyFromProductAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(removeQtyFromProductAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -290,11 +222,11 @@ export const appSlice = createSlice({
       .addCase(removeQtyFromProductAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(closeCurrentReportAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(closeCurrentReportAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -303,11 +235,11 @@ export const appSlice = createSlice({
       .addCase(closeCurrentReportAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(getInactiveInventoryReportsAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getInactiveInventoryReportsAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
@@ -326,11 +258,11 @@ export const appSlice = createSlice({
       .addCase(getInactiveInventoryReportsAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(getInventoryReportsByUidAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getInventoryReportsByUidAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
@@ -344,13 +276,13 @@ export const appSlice = createSlice({
       .addCase(getInventoryReportsByUidAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
 
       //packages-reports  
       .addCase(getActivePackagesReportsAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getActivePackagesReportsAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
@@ -365,11 +297,11 @@ export const appSlice = createSlice({
       .addCase(getActivePackagesReportsAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(addPackagesAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(addPackagesAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -378,11 +310,11 @@ export const appSlice = createSlice({
       .addCase(addPackagesAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(removePackagesAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(removePackagesAsync.fulfilled, (state, action) => {
         state.reloadReportsTable = true;
@@ -391,11 +323,11 @@ export const appSlice = createSlice({
       .addCase(removePackagesAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
       .addCase(getPackagesReportsByUidAsync.pending, (state) => {
         state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: genericErrorMessage }
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
       })
       .addCase(getPackagesReportsByUidAsync.fulfilled, (state, action) => {
         if (action.payload.docs.length > 0) {
@@ -409,7 +341,7 @@ export const appSlice = createSlice({
       .addCase(getPackagesReportsByUidAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : genericErrorMessage;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
   },
 });

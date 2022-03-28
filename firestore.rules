@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isLoggedIn()	{
+      return request.auth != null;
+    }
+    
+    function hasRole(role) {
+  		return isLoggedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+		}
+  
+    match /products/{product} {
+    	allow read: if isLoggedIn();
+      allow create, delete, write: if hasRole('admin');
+    }
+    
+    match /inventory-reports/{report} {
+      allow read, write: if hasRole('admin') || hasRole('inventoryManager');
+      allow create: if hasRole('admin');
+      allow delete: if false;
+    }
+    
+    match /packages-reports/{report} {
+      allow read, write: if hasRole('admin') || hasRole('inventoryManager');
+      allow create: if hasRole('admin');
+      allow delete: if false;
+    }
+    
+    match /inventory/{inventoryEntry} {
+      allow read, write, create: if hasRole('admin') || hasRole('inventoryManager');
+      allow delete: if false;
+    }
+    
+    match /packages/{packege} {
+    	allow read, write, create: if hasRole('admin') || hasRole('inventoryManager');
+      allow delete: if false;
+    }
+
+    match /users/{user} {
+      allow read: if isLoggedIn();
+      allow create, delete, write: if false;
+    }
+  }
+}

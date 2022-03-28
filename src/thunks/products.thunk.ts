@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { doc, Firestore, collection, getDocs, query, where, runTransaction, orderBy } from "firebase/firestore";
-import { genericErrorMessage } from "../constants/messages.constants";
+import { appErrors } from "../constants/messages.constants";
 import { ProductModel } from "../models/products.models";
 import { InventoryReport } from "../models/reports.models";
 
@@ -56,7 +56,7 @@ const deleteProductAsync = createAsyncThunk(
             const querrySnapshot = await getDocs(query(productsRef, where("uid", "==", uid)));
 
             if (querrySnapshot.docs.length != 1) {
-                return Promise.reject(genericErrorMessage);
+                return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             const reportsRef = collection(db as Firestore, reportsCollection)
@@ -68,7 +68,7 @@ const deleteProductAsync = createAsyncThunk(
                 const productIndex = docToBeUpdated.inventory.findIndex(p => p.uid === uid);
 
                 if (productIndex === -1) {
-                    return Promise.reject(genericErrorMessage);
+                    return Promise.reject(appErrors.get("genericErrorMessage") as string);
                 }
 
                 docToBeUpdated.inventory.splice(productIndex, 1);
