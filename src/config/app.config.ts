@@ -1,0 +1,1 @@
+export const appVersion: number = 1.2;

@@ -74,11 +74,16 @@ const Products: FC<ProductsProps> = () => {
   const deleteProduct = (product: ProductModel) => {
     dispatch(setConfirmationModalModel({
       title: appMessages.get("deleteProductModalTitle") as string,
-      message: appMessages.get("deleteProductModalMessage") as string 
+      message: appMessages.get("deleteProductModalMessage") as string,
+      buttonColor: "danger"
     }));
     dispatch(setConfirmationModal());
 
     setProductToBeDeleted(product);
+  }
+
+  const editProduct = (product: ProductModel) => {
+  
   }
 
   const showAddModal = () => {
@@ -112,7 +117,8 @@ const Products: FC<ProductsProps> = () => {
                   <th>Categorie</th>
                   { userHasAccess() && <th>Preț de referință</th> }
                   <th>Unitate de măsură</th>
-                  { userHasAccess() && <th>Șterge Produs</th> }
+                  { userHasAccess() && <th>Șterge Produsul</th> }
+                  { userHasAccess() && <th>Editează Produsul</th> }
                 </tr>
               </thead>
               <tbody>
@@ -124,7 +130,8 @@ const Products: FC<ProductsProps> = () => {
                     <td>{productTypesEngToRoMap.get(product.type)}</td>
                     { userHasAccess() && <td>{product.referencePrice}</td> }
                     <td>{product.unit}</td>
-                    { userHasAccess() &&  <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produs"></i></td> }
+                    { userHasAccess() && <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produsul"></i></td> }
+                    { userHasAccess() && <td onClick={() => editProduct(product)}><i className="bi bi-pencil-fill" title="Editează Produsul"></i></td> }
                   </tr>
                   ))
                 }

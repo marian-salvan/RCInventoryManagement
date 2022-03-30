@@ -10,8 +10,10 @@
 
 .grid-header-name:hover {
     cursor: pointer;
+    background-color: #e2e3e5;
 }
 
 .grid-header-category:hover  {
     cursor: pointer;
+    background-color: #e2e3e5;
 }

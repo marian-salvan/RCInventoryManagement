@@ -24,3 +24,8 @@
     color: red;
     cursor: pointer;
 }
+
+.bi.bi-pencil-fill {
+    cursor: pointer;
+    color: #6d7fcc;
+}

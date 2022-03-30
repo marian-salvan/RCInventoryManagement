@@ -3,7 +3,7 @@ import { FirebaseApp, initializeApp } from "firebase/app";
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { loggedUser, setFirebaseApp, setFirebaseDb, setLoggedInUser, showLoader } from './reducers/app.reducer';
-import { firebaseConfigDev } from './firebase.config';
+import { firebaseConfigDev } from './config/firebase.config';
 import { BrowserRouter  } from 'react-router-dom';
 import SideBar from './components/Sidebar/SideBar';
 import Content from './components/Content/Content';

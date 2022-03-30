@@ -8,7 +8,7 @@ import { productTypesEngToRoMap } from '../../constants/product-types.constants'
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
 import { ReportProductModel } from '../../models/reports.models';
-import { fireStoreDatabase, selectedInventoryReport, selectedPackageReport} from '../../reducers/app.reducer';
+import { fireStoreDatabase, gridCategoryFilter, selectedInventoryReport, selectedPackageReport, setGridCategoryFilter} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getInventoryReportsByUidAsync } from '../../thunks/inventory-reports.thunk';
 import { getPackagesReportsByUidAsync } from '../../thunks/packages-reports.thunk';
@@ -21,6 +21,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   const db = useAppSelector(fireStoreDatabase);
   const inventoryReport = useAppSelector(selectedInventoryReport);
   const packagesReport = useAppSelector(selectedPackageReport);
+  const categoryFilter = useAppSelector(gridCategoryFilter);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
 
@@ -33,20 +34,33 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
       dispatch(getInventoryReportsByUidAsync({db, uid}));
       dispatch(getPackagesReportsByUidAsync({db, uid}));
     }
+
+    return () => {
+      dispatch(setGridCategoryFilter(null));
+    }
   }, [reportId])
 
   useEffect(() => {
     if (inventoryReport) {
       const reports = inventoryReport.inventory.map(product => {
         return {...product, type: productTypesEngToRoMap.get(product.type) as string};
-      });
+      }).sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0));
 
-      setDisplayInventory(reports.sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0)));
+      (categoryFilter !== null) ? setDisplayInventory(reports.filter(x => x.type === categoryFilter)) :
+                                  setDisplayInventory(reports);
     }
-  }, [inventoryReport])
+  }, [inventoryReport, categoryFilter])
   
   const downloadReport = () => {
     dowloadReport("report-table", inventoryReport, packagesReport);
+  }
+
+  const getAverageQty = (): string => {
+    if (packagesReport && packagesReport.packages.quantity > 0 && packagesReport.packages.totalPackages > 0) {
+      return (Math.round((packagesReport.packages.quantity / packagesReport.packages.totalPackages) * 100) / 100).toFixed(2);
+    }
+
+    return "0.00";
   }
 
   return ( 
@@ -63,6 +77,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
             <h6>Perioada: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
             <h6>Nr total de pachete: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
             <h6>Cantitate : {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
+            <h6>Cantitatea medie per pachet: {getAverageQty()} (KG)</h6>
           </CardSubtitle>
           <div className="report-details-table-header">
               <GridCategoryFilter />
@@ -73,7 +88,10 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
                 <tr>
                   <th>#</th>
                   <th>Nume produs</th>
-                  <th>Categorie</th>
+                  <th>
+                    <i className="bi bi-arrow-up"></i>
+                    <span>Categorie</span>
+                  </th>
                   <th>Unitate de măsură</th>
                   <th>Preț de referință</th>
                   <th>Cantitate totată</th>

@@ -1,6 +1,7 @@
 export interface ConfirmationModalModel {
     title: string;
     message: string;
+    buttonColor: string;
 }
 
 export interface AddRemoveModalModel {

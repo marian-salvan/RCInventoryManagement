@@ -13,7 +13,6 @@ import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import AccessDenied from "../../pages/AccessDenied/AccessDenied";
 import AdminRoute from "../AdminRoute/AdminRoute";
 import InventoryManagerRoute from "../InventoryManagerRoute/InventoryManagerRoute";
-import PackageManagerRoute from "../PackageManagerRoute/PackageManagerRoute";
 import ReportDetails from "../../pages/ReportDetails/ReportDetails";
 
 const Content = () => {
@@ -22,13 +21,11 @@ const Content = () => {
   return (
     <Container
       fluid
-      className={classNames("content", { "is-open": isOpen })}
-    >
+      className={classNames("content", { "is-open": isOpen })}>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>}/>
         <Route path="/inventory" element={<InventoryManagerRoute><Inventory /></InventoryManagerRoute>}/>
-        {/* <Route path="/package-management" element={ <PackageManagerRoute><PackageManagement /></PackageManagerRoute> } /> */}
         <Route path="/package-management" element={ <InventoryManagerRoute><PackageManagement /></InventoryManagerRoute> } />
         <Route path="/reports" element={ <AdminRoute><Reports /></AdminRoute>} />
         <Route path="/reports/:reportId" element={<AdminRoute><ReportDetails /></AdminRoute>} />

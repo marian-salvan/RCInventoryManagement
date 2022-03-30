@@ -26,7 +26,7 @@ const ConfirmationModal: FC<ConfirmationModalProps> = () => {
         <ModalHeader toggle={toggle}>{modalModel.title}</ModalHeader>
         <ModalBody>{modalModel.message}</ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={confirm}>Confirmă</Button>
+          <Button color={modalModel.buttonColor} onClick={confirm}>Confirmă</Button>
           <Button color="secondary" onClick={toggle}>Anulează</Button>
         </ModalFooter>
       </Modal>

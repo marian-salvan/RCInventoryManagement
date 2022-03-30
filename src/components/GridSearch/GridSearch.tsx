@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { FormGroup, Input, Label } from 'reactstrap';
+import { Input } from 'reactstrap';
 import { setGridSearchText } from '../../reducers/app.reducer';
 import { useAppDispatch } from '../../stores/hooks';
 import './GridSearch.css';
@@ -22,11 +22,11 @@ const GridSearch: FC<GridSearchProps> = () => {
   return (
     <div className="grid-search-container">
       <Input onChange={handleSearchChange} 
-                className="search-input" 
-                type="search" 
-                name="search" 
-                id="search"
-                placeholder="Caută după nume"/>   
+             className="search-input" 
+             type="search" 
+             name="search" 
+             id="search"
+             placeholder="Caută după nume"/>   
     </div>
   );  
 

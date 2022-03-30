@@ -1,1 +1,7 @@
-.QuantityModal {}
+.add-product-modal .add-product-title {
+    color: #6d7fcc;
+}
+
+.add-product-modal .substract-product-title {
+    color: red;
+}

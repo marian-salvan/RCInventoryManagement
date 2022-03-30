@@ -36,6 +36,7 @@ export interface AppState {
     selectedInventoryReport: InventoryReport | null;
     selectedPackageReport: PacakagesReport | null;
     errorModalModel: ErrorModalModel;
+    gridCategoryFilter: string | null;
 }
   
 export const initialState: AppState = {
@@ -51,7 +52,8 @@ export const initialState: AppState = {
     showConfirmationModal: false,
     confirmationModalModel: {
         title: appMessages.get("confirmationModalDefaultTitle") as string,
-        message: appMessages.get("confirmationModalDefaultMessage") as string
+        message: appMessages.get("confirmationModalDefaultMessage") as string,
+        buttonColor: "primary"
     },
     actionAccepted: false,
     productToBeAdded: null,
@@ -72,5 +74,6 @@ export const initialState: AppState = {
     errorModalModel: {
         showError: false,
         errorMesage: appErrors.get("genericErrorMessage") as string,
-    }
+    },
+    gridCategoryFilter: null
 };

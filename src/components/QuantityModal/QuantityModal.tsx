@@ -96,7 +96,13 @@ const QuantityModal: FC<QuantityModalProps> = () => {
   return (
     <div>
       <Modal isOpen={showModal} autoFocus={false} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>{quantityModal?.modalTitle} ({getSelectedProductName()})</ModalHeader>
+        <ModalHeader toggle={toggle}>{quantityModal?.modalTitle} 
+        {
+          quantityModal?.addQty ? 
+          <span className="add-product-title"> {getSelectedProductName()}</span> :
+          <span className="substract-product-title"> {getSelectedProductName()}</span>
+        }
+        </ModalHeader>
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>

@@ -7,6 +7,7 @@ import { firebaseApp, loggedInUserMetadata, setSideBarIsOpen, sideBarIsOpen } fr
 import { getAuth } from "firebase/auth";
 import { FirebaseApp } from "firebase/app";
 import { signOutUserAsync } from "../../thunks/auth.thunk";
+import { appVersion } from "../../config/app.config";
 
 const SideBar = () => {
   const dispatch = useAppDispatch();
@@ -32,10 +33,14 @@ const SideBar = () => {
   return (
     <div className={classNames("sidebar", { "is-open": isOpen })}>
       <div className="sidebar-header">
-        <span color="info" onClick={() => toggle} style={{ color: "#fff" }}>
+        <span className="app-version">v{appVersion}</span>
+        <span className="close-header" color="info" onClick={() => toggle} style={{ color: "#fff" }}>
           &times;
         </span>
-        <h3>CRR Cluj - Gestiunea donațiilor</h3>
+        <div className="logo-container">
+          <img className="logo-image" src="/logo.png" />
+          <h4>CRR Cluj - Gestiunea donațiilor</h4>
+        </div>
       </div>
       <div className="side-menu">
         <Nav vertical className="list-unstyled pb-3">

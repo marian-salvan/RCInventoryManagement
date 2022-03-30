@@ -79,6 +79,9 @@ export const appSlice = createSlice({
     },
     setErrorModalModel: (state, action: PayloadAction<ErrorModalModel>) => {
       state.errorModalModel = action.payload;
+    },
+    setGridCategoryFilter: (state, action: PayloadAction<string | null>) => {
+      state.gridCategoryFilter = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -323,7 +326,7 @@ export const appSlice = createSlice({
       .addCase(removePackagesAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message: appErrors.get("genericErrorMessage") as string;
       })
       .addCase(getPackagesReportsByUidAsync.pending, (state) => {
         state.showLoader = true;
@@ -350,7 +353,7 @@ export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen,
   setAddProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
   setProductToBeAdded, setReloadProductsTable, setReloadReportsTable, setNewReportName,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
-  setPackagesModalModel, setGridSearchText, setErrorModalModel } = appSlice.actions;
+  setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -380,5 +383,6 @@ export const inactiveInventoryReports = (state: RootState) => state.appReducer.i
 export const selectedInventoryReport = (state: RootState) => state.appReducer.selectedInventoryReport;
 export const selectedPackageReport = (state: RootState) => state.appReducer.selectedPackageReport;
 export const errorModalModel = (state: RootState) => state.appReducer.errorModalModel;
+export const gridCategoryFilter = (state: RootState) => state.appReducer.gridCategoryFilter;
 
 export default appSlice.reducer;

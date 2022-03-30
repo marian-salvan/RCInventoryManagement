@@ -7,8 +7,9 @@ import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { ReportProductModel } from '../../models/reports.models';
 import { actionAccepted, activeInventoryReport, activePackagesReport, allProducts, fireStoreDatabase, 
+  gridCategoryFilter, 
   gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted,
-  setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, 
+  setConfirmationModal, setConfirmationModalModel, setGridCategoryFilter, setGridSearchText, setInventoryEntryToAdd, 
   setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel,
   setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -21,6 +22,8 @@ import { appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { dowloadReport } from '../../helpers/reports.helper';
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
+import { GRID_SORT_ENUM } from '../../constants/grid.constants';
+import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 
 interface InventoryProps {}
 
@@ -34,9 +37,11 @@ const Inventory: FC<InventoryProps> = () => {
   const inventoryConfirmation = useAppSelector(actionAccepted);
   const reportName = useAppSelector(newReportName);
   const searchText = useAppSelector(gridSearchText);
+  const categoryFilter = useAppSelector(gridCategoryFilter);
   const userMetadata = useAppSelector(loggedInUserMetadata);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
+  const [orderByColumn, setOrderByColumn] = useState<string>(GRID_SORT_ENUM.NAME);
 
   useEffect(() => {
     dispatch(getActiveInventoryReportsAsync(db));
@@ -44,6 +49,7 @@ const Inventory: FC<InventoryProps> = () => {
 
     return () => {
       dispatch(setGridSearchText(null));
+      dispatch(setGridCategoryFilter(null));
     }
   }, []);
 
@@ -56,17 +62,19 @@ const Inventory: FC<InventoryProps> = () => {
 
   useEffect(() => { 
     if (currentInventoryReport) {
-
       const sortedInventory = currentInventoryReport.inventory.map(product => {
         return {...product, type: productTypesEngToRoMap.get(product.type) as string};
-      });
+      }).sort(getProductModelSortingFunc(orderByColumn));
 
-      sortedInventory.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+      const searchedInventory = (searchText !== null) ? sortedInventory.filter(x => x.name.includes(searchText)):
+                                                        sortedInventory;
 
-      (searchText !== null) ? setDisplayInventory(sortedInventory.filter(x => x.name.includes(searchText))) :
-                              setDisplayInventory(sortedInventory);
+      const filteredInventory = (categoryFilter !== null) ? searchedInventory.filter(x => x.type === categoryFilter) :
+                                                            searchedInventory;
+
+      setDisplayInventory(filteredInventory);
     }
-  }, [currentInventoryReport, searchText])
+  }, [currentInventoryReport, searchText, categoryFilter, orderByColumn])
   
   useEffect(() => {
     if (inventoryConfirmation) {
@@ -135,7 +143,8 @@ const Inventory: FC<InventoryProps> = () => {
   const showCloseConfirmationModal = () => {
     dispatch(setConfirmationModalModel({
       title: appMessages.get("closeCurrentInventoryTitle") as string,
-      message: appMessages.get("closeCurrentInventoryMessage") as string 
+      message: appMessages.get("closeCurrentInventoryMessage") as string,
+      buttonColor: "danger"
     }));
 
     dispatch(setConfirmationModal());  
@@ -147,6 +156,10 @@ const Inventory: FC<InventoryProps> = () => {
 
   const showCreateNewReportModal = () => {
     dispatch(setNewReportModal());
+  }
+
+  const sortAfterColumn = (sortColumn: GRID_SORT_ENUM) => {
+    setOrderByColumn(sortColumn);
   }
 
   const userHasAccess = (): boolean => {
@@ -178,12 +191,16 @@ const Inventory: FC<InventoryProps> = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th className="grid-header-name">
-                      <i className="bi bi-arrow-up"></i>
+                    <th className="grid-header-name" onClick={() => sortAfterColumn(GRID_SORT_ENUM.NAME)}>
+                      {
+                        orderByColumn === GRID_SORT_ENUM.NAME && <i className="bi bi-arrow-up"></i> 
+                      }
                       <span>Nume produs </span>
                     </th>
-                    <th className="grid-header-category">
-                      <i className="bi bi-arrow-up"></i>  
+                    <th className="grid-header-category" onClick={() => sortAfterColumn(GRID_SORT_ENUM.TYPE)}>
+                      {
+                        orderByColumn === GRID_SORT_ENUM.TYPE && <i className="bi bi-arrow-up"></i> 
+                      }
                       <span>Categorie</span>
                     </th>
                     <th>Unitate de măsură</th>
