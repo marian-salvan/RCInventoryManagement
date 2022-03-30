@@ -151,14 +151,14 @@ const Inventory: FC<InventoryProps> = () => {
   }
 
   const downloadReport = () => {
-    dowloadReport("inventory-table", currentInventoryReport, packagesReport);
+    dowloadReport("inventory-table", currentInventoryReport, packagesReport, categoryFilter);
   }
 
   const showCreateNewReportModal = () => {
     dispatch(setNewReportModal());
   }
 
-  const sortAfterColumn = (sortColumn: GRID_SORT_ENUM) => {
+  const sortAfterColumn = (sortColumn: string) => {
     setOrderByColumn(sortColumn);
   }
 

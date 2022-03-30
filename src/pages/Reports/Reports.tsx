@@ -19,7 +19,7 @@ const Reports: FC<ReportsProps> = () => {
   }, [])
   
   const navigateToReportDetails = (uid: string) => {
-    navigate(`/reports/${uid}`, { replace: true });
+    navigate(`/reports/${uid}`, { replace: false });
   }
 
   return ( 

@@ -4,9 +4,11 @@ import { Button, Card, CardBody, CardSubtitle, CardTitle, Table } from 'reactstr
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
+import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
+import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 import { ReportProductModel } from '../../models/reports.models';
 import { fireStoreDatabase, gridCategoryFilter, selectedInventoryReport, selectedPackageReport, setGridCategoryFilter} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -44,7 +46,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     if (inventoryReport) {
       const reports = inventoryReport.inventory.map(product => {
         return {...product, type: productTypesEngToRoMap.get(product.type) as string};
-      }).sort((a, b) => (a.type > b.type) ? 1 : ((b.type > a.type) ? -1 : 0));
+      }).sort(getProductModelSortingFunc(GRID_SORT_ENUM.NAME));
 
       (categoryFilter !== null) ? setDisplayInventory(reports.filter(x => x.type === categoryFilter)) :
                                   setDisplayInventory(reports);
@@ -52,7 +54,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   }, [inventoryReport, categoryFilter])
   
   const downloadReport = () => {
-    dowloadReport("report-table", inventoryReport, packagesReport);
+    dowloadReport("report-table", inventoryReport, packagesReport, categoryFilter);
   }
 
   const getAverageQty = (): string => {

@@ -3,7 +3,7 @@ import { InventoryReport, PacakagesReport } from "../models/reports.models";
 const dowloadReport = (tableId: string, 
                        inventoryReport: InventoryReport | null, 
                        packagesReport: PacakagesReport | null,
-                       category: string = "all") => {
+                       category: string | null) => {
     var XLSX = require("xlsx");
     var workbook = XLSX.utils.book_new();
 
@@ -26,7 +26,10 @@ const dowloadReport = (tableId: string,
     ]);
     XLSX.utils.book_append_sheet(workbook, sheet2, "Sheet2");
 
-    XLSX.writeFile(workbook, `${inventoryReport?.name}_${category}.xlsx`);
+    const workbookTitle = category ? `${inventoryReport?.name}_${category}.xlsx` :
+                                     `${inventoryReport?.name}.xlsx`
+
+    XLSX.writeFile(workbook, workbookTitle);
 }
 
 export { dowloadReport };
