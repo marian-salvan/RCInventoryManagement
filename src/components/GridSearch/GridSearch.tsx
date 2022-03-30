@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Input } from 'reactstrap';
+import { FormGroup, Input, Label } from 'reactstrap';
 import { setGridSearchText } from '../../reducers/app.reducer';
 import { useAppDispatch } from '../../stores/hooks';
 import './GridSearch.css';
@@ -11,7 +11,7 @@ const GridSearch: FC<GridSearchProps> = () => {
   const dispatch = useAppDispatch();
 
   const delayedCallback = _.debounce((event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setGridSearchText(event.target.value));
+    dispatch(setGridSearchText(event.target.value.toLowerCase()));
   }, 500);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,12 +21,12 @@ const GridSearch: FC<GridSearchProps> = () => {
 
   return (
     <div className="grid-search-container">
-        <Input onChange={handleSearchChange} 
+      <Input onChange={handleSearchChange} 
                 className="search-input" 
                 type="search" 
                 name="search" 
                 id="search"
-                placeholder="Caută după nume"/>
+                placeholder="Caută după nume"/>   
     </div>
   );  
 

@@ -25,11 +25,10 @@ const QuantityModal: FC<QuantityModalProps> = () => {
 
   useEffect(() => {
     if (quantityModal) {
-      setShowModal(true);
+      setShowModal(true);   
     }
   }, [quantityModal])
-  
-  
+
   const toggle = () => {
     setEditQuantityModel({
       quantity: 0,
@@ -76,20 +75,36 @@ const QuantityModal: FC<QuantityModalProps> = () => {
     toggle();
   }
 
+  const getSelectedProductName = (): string => {
+    return quantityModal?.addQty ? reportToAdd?.name as string : reportToSubstract?.name as string;
+  }
+
+  const getSelectedProductUnit = (): string => {
+    return quantityModal?.addQty ? reportToAdd?.unit as string : reportToSubstract?.unit as string;
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && editQuantityModel.validQuantity) {
+      updateQuantity();
+    }
+  }
+
   return (
     <div>
-      <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>{quantityModal?.modalTitle}</ModalHeader>
+      <Modal isOpen={showModal} autoFocus={false} toggle={toggle} className="add-product-modal">
+        <ModalHeader toggle={toggle}>{quantityModal?.modalTitle} ({getSelectedProductName()})</ModalHeader>
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
-              <Label for="quantity">Cantitate</Label>
+              <Label for="quantity">Cantitate ({getSelectedProductUnit()})</Label>
               <Input
+                autoFocus={true}
                 onChange={handleQuantityChange}
+                onKeyDown={handleKeyDown}
                 type="number"
                 name="quantity"
                 id="quantity"
@@ -103,7 +118,8 @@ const QuantityModal: FC<QuantityModalProps> = () => {
           </Form>
         </ModalBody>
         <ModalFooter>
-          <Button color={quantityModal?.buttonClass}
+          <Button type="submit"
+                  color={quantityModal?.buttonClass}
                   onClick={updateQuantity} 
                   disabled={!(editQuantityModel.validQuantity)}>
                     {quantityModal?.buttonText}

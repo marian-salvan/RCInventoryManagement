@@ -86,6 +86,12 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
     event.preventDefault();
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !isButtonDisabled()) {
+      updateQuantity();
+    }
+  }
+
   const isButtonDisabled = (): boolean => {
     return !(editPackagesStateModel.validQuantity && editPackagesStateModel.validTotalPackages);
   }
@@ -100,6 +106,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
               <Label for="totalPackages">Număr de pachete</Label>
               <Input
                 onChange={handleTotalPackagesChange}
+                onKeyDown={handleKeyDown}
                 type="number"
                 name="totalPackages"
                 id="totalPackages"
@@ -115,6 +122,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
               <Label for="quantity">Cantitate (KG)</Label>
               <Input
                 onChange={handleQuantityChange}
+                onKeyDown={handleKeyDown}
                 type="number"
                 name="quantity"
                 id="quantity"
@@ -131,7 +139,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
           <Button color={editPackageModel?.buttonClass} 
                   onClick={updateQuantity} 
                   disabled={isButtonDisabled()}>
-                    {editPackageModel?.buttonText}
+                  {editPackageModel?.buttonText}
           </Button>
           <Button color="secondary" onClick={toggle}>Anulează</Button>
         </ModalFooter>

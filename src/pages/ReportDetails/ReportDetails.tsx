@@ -2,9 +2,11 @@ import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, CardBody, CardSubtitle, CardTitle, Table } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
+import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
+import { dowloadReport } from '../../helpers/reports.helper';
 import { ReportProductModel } from '../../models/reports.models';
 import { fireStoreDatabase, selectedInventoryReport, selectedPackageReport} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -44,21 +46,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   }, [inventoryReport])
   
   const downloadReport = () => {
-    var XLSX = require("xlsx");
-    var workbook = XLSX.utils.book_new();
-
-    var sheet1 = XLSX.utils.table_to_sheet(document.getElementById("report-table"));
-    XLSX.utils.book_append_sheet(workbook, sheet1, "Sheet1");
-
-    var sheet2 = XLSX.utils.aoa_to_sheet([
-      ["Data de început", inventoryReport?.fromDate.toDate().toLocaleDateString()],
-      ["Data de final", inventoryReport?.toDate?.toDate().toLocaleDateString()],
-      ["Total pachete", packagesReport?.packages.totalPackages],
-      ["Cantitate pachete (KG)", packagesReport?.packages.quantity]
-    ]);
-    XLSX.utils.book_append_sheet(workbook, sheet2, "Sheet2");
-
-    XLSX.writeFile(workbook, `${inventoryReport?.name}.xlsx`);
+    dowloadReport("report-table", inventoryReport, packagesReport);
   }
 
   return ( 
@@ -76,6 +64,9 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
             <h6>Nr total de pachete: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
             <h6>Cantitate : {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
           </CardSubtitle>
+          <div className="report-details-table-header">
+              <GridCategoryFilter />
+            </div>
           <div className="table-container">
             <Table hover className="products-table" id="report-table">
               <thead>

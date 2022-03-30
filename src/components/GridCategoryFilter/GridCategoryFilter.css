@@ -1,0 +1,9 @@
+.grid-category-filter-container {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.grid-category-filter-container .category-filter {
+    width: 200px;
+}

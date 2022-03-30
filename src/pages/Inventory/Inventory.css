@@ -2,3 +2,16 @@
     cursor: pointer;
     color: #6d7fcc;
 }
+
+.inventory-table-header {
+    display: flex;
+    column-gap: 10px;
+}
+
+.grid-header-name:hover {
+    cursor: pointer;
+}
+
+.grid-header-category:hover  {
+    cursor: pointer;
+}

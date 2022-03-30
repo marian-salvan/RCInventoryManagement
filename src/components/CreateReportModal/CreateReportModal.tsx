@@ -49,6 +49,12 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
     event.preventDefault();
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && newReportState.validName) {
+      createNewReport();
+    }
+  }
+
   return (
     <div>
       <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
@@ -60,6 +66,7 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
               <Label for="name">Nume inventar</Label>
               <Input
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 type="text"
                 name="name"
                 id="name"

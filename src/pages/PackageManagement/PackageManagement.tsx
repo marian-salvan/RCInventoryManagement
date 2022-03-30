@@ -58,6 +58,14 @@ const PackageManagement: FC<PackageManagementProps> = () => {
     return userMetadata?.role == ROLES.ADMIN;
   } 
 
+  const getAverageQty = (): string => {
+    if (currentReport && currentReport.packages.quantity > 0 && currentReport.packages.totalPackages > 0) {
+      return (Math.round((currentReport.packages.quantity / currentReport.packages.totalPackages) * 100) / 100).toFixed(2);
+    }
+
+    return "0.00";
+  }
+
   if (currentReport?.active) {
     return (
       <div className="products-container">
@@ -73,9 +81,10 @@ const PackageManagement: FC<PackageManagementProps> = () => {
         <CardSubtitle className="card-title">
           <h6>Inventar curent: {currentReport.name}</h6>
         </CardSubtitle>  
-        <Alert color="secondary" className="total-container">
+        <Alert color="secondary" className="total-container" fade={false}>
           <h6 className="total-container-item">Totalul de pachete: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
           <h6 className="total-container-item">Cantitatea totală: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
+          <h6 className="total-container-item">Cantitatea medie per pachet: {getAverageQty()} (KG)</h6>
         </Alert>
       </CardBody>
       </Card>

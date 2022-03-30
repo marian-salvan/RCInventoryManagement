@@ -1,1 +1,4 @@
-.ReportDetails {}
+.report-details-table-header {
+    display: flex;
+    column-gap: 10px;
+}

@@ -6,7 +6,11 @@ import GridSearch from '../../components/GridSearch/GridSearch';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { ReportProductModel } from '../../models/reports.models';
-import { actionAccepted, activeInventoryReport, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
+import { actionAccepted, activeInventoryReport, activePackagesReport, allProducts, fireStoreDatabase, 
+  gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted,
+  setConfirmationModal, setConfirmationModalModel, setGridSearchText, setInventoryEntryToAdd, 
+  setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel,
+  setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getAllProductsAsync } from '../../thunks/products.thunk';
 import { closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync } from '../../thunks/inventory-reports.thunk';
@@ -14,6 +18,9 @@ import  './Inventory.css';
 import { defaulPackagesReportModel, defaultInventoryReportModel } from '../../constants/default.configs';
 import { ROLES } from '../../constants/roles.enums';
 import { appMessages } from '../../constants/messages.constants';
+import { productTypesEngToRoMap } from '../../constants/product-types.constants';
+import { dowloadReport } from '../../helpers/reports.helper';
+import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 
 interface InventoryProps {}
 
@@ -22,6 +29,7 @@ const Inventory: FC<InventoryProps> = () => {
   const db = useAppSelector(fireStoreDatabase);
   const reload = useAppSelector(reloadReportsTable);
   const currentInventoryReport = useAppSelector(activeInventoryReport);
+  const packagesReport = useAppSelector(activePackagesReport);
   const availableProducts = useAppSelector(allProducts);
   const inventoryConfirmation = useAppSelector(actionAccepted);
   const reportName = useAppSelector(newReportName);
@@ -48,8 +56,15 @@ const Inventory: FC<InventoryProps> = () => {
 
   useEffect(() => { 
     if (currentInventoryReport) {
-      (searchText !== null) ? setDisplayInventory(currentInventoryReport.inventory.filter(x => x.name.includes(searchText))) :
-                              setDisplayInventory(currentInventoryReport.inventory);
+
+      const sortedInventory = currentInventoryReport.inventory.map(product => {
+        return {...product, type: productTypesEngToRoMap.get(product.type) as string};
+      });
+
+      sortedInventory.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+
+      (searchText !== null) ? setDisplayInventory(sortedInventory.filter(x => x.name.includes(searchText))) :
+                              setDisplayInventory(sortedInventory);
     }
   }, [currentInventoryReport, searchText])
   
@@ -65,8 +80,6 @@ const Inventory: FC<InventoryProps> = () => {
       let inventory: ReportProductModel[] = [];
       const { v4: uuidv4 } = require('uuid');
       const uid =  uuidv4();
-
-      debugger;
 
       availableProducts?.map(p => {
         let reportProductModel: ReportProductModel = {
@@ -128,6 +141,10 @@ const Inventory: FC<InventoryProps> = () => {
     dispatch(setConfirmationModal());  
   }
 
+  const downloadReport = () => {
+    dowloadReport("inventory-table", currentInventoryReport, packagesReport);
+  }
+
   const showCreateNewReportModal = () => {
     dispatch(setNewReportModal());
   }
@@ -146,18 +163,29 @@ const Inventory: FC<InventoryProps> = () => {
               {
                 userHasAccess() &&
                 <div className="button-container">
-                <Button className="add-button" color="primary" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
+                  <Button className="add-button" color="danger" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
+                  <Button className="add-button" color="primary" onClick={() => downloadReport()}>Descarcă raport intermediar</Button>
                 </div>
               }
             </CardTitle>
             <CardSubtitle><h6>Perioada: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
-            <GridSearch />
+            <div className="inventory-table-header">
+              <GridSearch />
+              <GridCategoryFilter />
+            </div>
             <div className="table-container">
-              <Table hover className="products-table">
+              <Table hover className="inventory-table" id="inventory-table">
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Nume produs</th>
+                    <th className="grid-header-name">
+                      <i className="bi bi-arrow-up"></i>
+                      <span>Nume produs </span>
+                    </th>
+                    <th className="grid-header-category">
+                      <i className="bi bi-arrow-up"></i>  
+                      <span>Categorie</span>
+                    </th>
                     <th>Unitate de măsură</th>
                     { userHasAccess() && <th>Preț de referință</th> }
                     <th>Cantitate curentă</th>
@@ -172,6 +200,7 @@ const Inventory: FC<InventoryProps> = () => {
                     <tr key={product.name}>
                       <th scope="row">{index + 1}</th>
                       <td>{product.name}</td>
+                      <td>{product.type}</td>
                       <td>{product.unit}</td>
                       { userHasAccess() && <td>{product.referencePrice }</td> }
                       <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)} ({product.unit})</td>

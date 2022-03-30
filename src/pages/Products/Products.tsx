@@ -105,7 +105,10 @@ const Products: FC<ProductsProps> = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Nume produs</th>
+                  <th>
+                    <i className="bi bi-arrow-up"></i>
+                    <span>Nume produs </span>
+                  </th>
                   <th>Categorie</th>
                   { userHasAccess() && <th>Preț de referință</th> }
                   <th>Unitate de măsură</th>

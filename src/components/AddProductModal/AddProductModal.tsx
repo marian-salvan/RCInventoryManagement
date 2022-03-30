@@ -87,6 +87,12 @@ const AddProductModal: FC<AddProductModalProps> = () => {
     event.preventDefault();
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && (addProductModel.validName && addProductModel.validReferencePrice)) {
+      saveProduct();
+    }
+  }
+
   return (
     <div>
       <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
@@ -97,6 +103,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               <Label for="productName">Nume</Label>
               <Input
                 onChange={handleNameChange}
+                onKeyDown={handleKeyDown}
                 type="text"
                 name="name"
                 id="productName"
@@ -111,6 +118,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               <Label for="referencePrice">Preț de referință</Label>
               <Input
                 onChange={handleReferencePriceChange}
+                onKeyDown={handleKeyDown}
                 type="number"
                 name="referencePrice"
                 id="referencePrice"
