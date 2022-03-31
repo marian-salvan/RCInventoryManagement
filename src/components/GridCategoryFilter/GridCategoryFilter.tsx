@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Input } from 'reactstrap';
-import { productTypesOptions, productTypesRoToEngMap, } from '../../constants/product-types.constants';
+import { appLabels } from '../../constants/messages.constants';
+import { productTypesOptions } from '../../constants/product-types.constants';
 import { setGridCategoryFilter } from '../../reducers/app.reducer';
 import { useAppDispatch } from '../../stores/hooks';
 import './GridCategoryFilter.css';
@@ -23,8 +24,8 @@ const GridCategoryFilter: FC<GridCategoryFilterProps> = () => {
   return (
     <div className="grid-category-filter-container">
       <Input type="select" name="type" id="category-filter" className="category-filter" onChange={handleInputChange}>
-          <option hidden value="">Selectează categoria</option>
-          <option value="">toate</option>  
+          <option hidden value="">{appLabels.get("selectCategory")}</option>
+          <option value="">{appLabels.get("all")}</option>  
           {
             productTypesOptions.map(opt => (
               <option key={opt}>{opt}</option>

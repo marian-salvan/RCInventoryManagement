@@ -3,7 +3,7 @@ import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import AddProductModal from '../../components/AddProductModal/AddProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import GridSearch from '../../components/GridSearch/GridSearch';
-import { appMessages } from '../../constants/messages.constants';
+import { appLabels, appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ROLES } from '../../constants/roles.enums';
 import { ProductModel } from '../../models/products.models';
@@ -99,9 +99,9 @@ const Products: FC<ProductsProps> = () => {
        <Card>
         <CardBody>
           <CardTitle className="card-title">
-            <h4>Lista de produse</h4>
+            <h4>{appLabels.get("productList")}</h4>
             <div className="button-container">
-            { userHasAccess() && <Button className="add-button" color="primary" onClick={() => showAddModal()}>Adaugă produs</Button> }
+            { userHasAccess() && <Button className="add-button" color="primary" onClick={() => showAddModal()}>{appLabels.get("addProduct")}</Button> }
             </div>
           </CardTitle>  
           <GridSearch />
@@ -112,13 +112,13 @@ const Products: FC<ProductsProps> = () => {
                   <th>#</th>
                   <th>
                     <i className="bi bi-arrow-up"></i>
-                    <span>Nume produs </span>
+                    <span>{appLabels.get("inventoryGridProduct")}</span>
                   </th>
-                  <th>Categorie</th>
-                  { userHasAccess() && <th>Preț de referință</th> }
-                  <th>Unitate de măsură</th>
-                  { userHasAccess() && <th>Șterge Produsul</th> }
-                  { userHasAccess() && <th>Editează Produsul</th> }
+                  <th>{appLabels.get("inventoryGridCategory")}</th>
+                  { userHasAccess() && <th>{appLabels.get("inventoryGridReferencePrice")}</th> }
+                  <th>{appLabels.get("inventoryGridUnit")}</th>
+                  { userHasAccess() && <th>{appLabels.get("deleteProduct")}</th> }
+                  { userHasAccess() && <th>{appLabels.get("editProduct")}</th> }
                 </tr>
               </thead>
               <tbody>
@@ -130,8 +130,8 @@ const Products: FC<ProductsProps> = () => {
                     <td>{productTypesEngToRoMap.get(product.type)}</td>
                     { userHasAccess() && <td>{product.referencePrice}</td> }
                     <td>{product.unit}</td>
-                    { userHasAccess() && <td onClick={() => deleteProduct(product)}><i className=" bi bi-dash-circle" title="Șterge Produsul"></i></td> }
-                    { userHasAccess() && <td onClick={() => editProduct(product)}><i className="bi bi-pencil-fill" title="Editează Produsul"></i></td> }
+                    { userHasAccess() && <td onClick={() => deleteProduct(product)}><i className="bi bi-x-circle" title={appLabels.get("deleteProduct")}></i></td> }
+                    { userHasAccess() && <td onClick={() => editProduct(product)}><i className="bi bi-pencil-fill" title={appLabels.get("editProduct")}></i></td> }
                   </tr>
                   ))
                 }

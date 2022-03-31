@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { appLabels } from '../../constants/messages.constants';
 import { confirmationModalModel, setActionAccepted, setConfirmationModal, showConfirmationModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import './ConfirmationModal.css';
@@ -26,8 +27,8 @@ const ConfirmationModal: FC<ConfirmationModalProps> = () => {
         <ModalHeader toggle={toggle}>{modalModel.title}</ModalHeader>
         <ModalBody>{modalModel.message}</ModalBody>
         <ModalFooter>
-          <Button color={modalModel.buttonColor} onClick={confirm}>Confirmă</Button>
-          <Button color="secondary" onClick={toggle}>Anulează</Button>
+          <Button color={modalModel.buttonColor} onClick={confirm}>{appLabels.get("confirm")}</Button>
+          <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
     </div>

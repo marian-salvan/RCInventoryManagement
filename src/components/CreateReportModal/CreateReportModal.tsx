@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
-import { appMessages } from '../../constants/messages.constants';
+import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
 import { NewReportStateModel } from '../../models/forms.models';
 import { fireStoreDatabase, showNewReportModal, setNewReportModal, setNewReportName } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -63,7 +63,7 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
           <div>{appMessages.get("createCurrentInventoryMessage")}</div>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
-              <Label for="name">Nume inventar</Label>
+              <Label for="name">{appLabels.get("inventoryName")}</Label>
               <Input
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
@@ -74,14 +74,14 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
                 invalid={ newReportState.validName !== null && !newReportState.validName }
               />
               <FormFeedback>
-                Numele este obligatoriu
+                {appValidations.get("mandatoryName")}
               </FormFeedback>
             </FormGroup>
           </Form>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={createNewReport} disabled={!(newReportState.validName)}>Salvează</Button>{' '}
-          <Button color="secondary" onClick={toggle}>Anulează</Button>
+          <Button color="primary" onClick={createNewReport} disabled={!(newReportState.validName)}>{appLabels.get("save")}</Button>{' '}
+          <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
   </div>

@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import { FirebaseApp } from "firebase/app";
 import { signOutUserAsync } from "../../thunks/auth.thunk";
 import { appVersion } from "../../config/app.config";
+import { appMessages } from "../../constants/messages.constants";
 
 const SideBar = () => {
   const dispatch = useAppDispatch();
@@ -38,35 +39,35 @@ const SideBar = () => {
           &times;
         </span>
         <div className="logo-container">
-          <img className="logo-image" src="/logo.png" />
-          <h4>CRR Cluj - Gestiunea donațiilor</h4>
+          <img className="logo-image" src="/logo-full.png" />
+          <h4>{appMessages.get("appTitle")}</h4>
         </div>
       </div>
       <div className="side-menu">
         <Nav vertical className="list-unstyled pb-3">
-          <p>Salut, {userMetadata?.email}</p>
+          <p>{appMessages.get("appGreeting")}, {userMetadata?.email}</p>
           <NavItem className={checkActiveRoute("/products") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/products"}>
-            <i className="bi bi-bag-heart"></i> Produse 
+            <i className="bi bi-bag-heart"></i> {appMessages.get("productsTitle")} 
             </NavLink>
           </NavItem>
           <NavItem className={checkActiveRoute("/inventory") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/inventory"} >
-            <i className="bi bi-list-ul"></i> Inventar 
+            <i className="bi bi-list-ul"></i> {appMessages.get("inventoryTitle")}  
             </NavLink>
           </NavItem>
           <NavItem className={checkActiveRoute("/package-management") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/package-management"}>
-              <i className="bi bi-box2"></i> Pachete
+              <i className="bi bi-box2"></i> {appMessages.get("packagesTitle")}
             </NavLink>
           </NavItem>
           <NavItem className={checkActiveRoute("/reports") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/reports"}>
-              <i className="bi bi-files"></i> Rapoarte
+              <i className="bi bi-files"></i> {appMessages.get("reportsTitle")}
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink onClick={ () => logOut()}><i className="bi bi-power"></i> Ieșiți din cont</NavLink>
+            <NavLink onClick={ () => logOut()}><i className="bi bi-power"></i> {appMessages.get("logOutTitle")}</NavLink>
           </NavItem>
         </Nav>
       </div>

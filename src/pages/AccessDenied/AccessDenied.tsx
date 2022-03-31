@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Card, CardBody, CardTitle } from 'reactstrap';
+import { appMessages } from '../../constants/messages.constants';
 import './AccessDenied.css';
 
 interface AccessDeniedProps {}
@@ -9,7 +10,7 @@ const AccessDenied: FC<AccessDeniedProps> = () => (
     <Card>
     <CardBody>
       <CardTitle className="card-title">
-        <h4>Nu ai acces la această pagină</h4>
+        <h4>{appMessages.get("accessDenied")}</h4>
       </CardTitle>   
     </CardBody>
     </Card>

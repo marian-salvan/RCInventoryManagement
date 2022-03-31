@@ -1,11 +1,12 @@
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, CardBody, CardSubtitle, CardTitle } from 'reactstrap';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import EditPackagesModal from '../../components/EditPackagesModal/EditPackagesModal';
-import { appMessages } from '../../constants/messages.constants';
+import { appLabels, appMessages } from '../../constants/messages.constants';
 import { ROLES } from '../../constants/roles.enums';
-import { activePackagesReport, fireStoreDatabase, loggedInUserMetadata, reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
+import { activePackagesReport, fireStoreDatabase, loggedInUserMetadata,
+  reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getActivePackagesReportsAsync } from '../../thunks/packages-reports.thunk';
 import './PackageManagement.css';
@@ -72,19 +73,19 @@ const PackageManagement: FC<PackageManagementProps> = () => {
       <Card>
       <CardBody>
         <CardTitle className="card-title">
-          <h4>Adaugă pachete</h4>
+          <h4>{appLabels.get("addPackages")}</h4>
           <div className="button-container">
-            <Button className="add-button" color="danger" onClick={() => openRemovePackagesModal()}>Șterge pachete</Button>
-            <Button className="add-button" color="primary" onClick={() => openAddPackagesModal()}>Adaugă pachete</Button>
+            <Button className="add-button" color="danger" onClick={() => openRemovePackagesModal()}>{appLabels.get("deletePackages")}</Button>
+            <Button className="add-button" color="primary" onClick={() => openAddPackagesModal()}>{appLabels.get("addPackages")}</Button>
           </div>
         </CardTitle>   
         <CardSubtitle className="card-title">
-          <h6>Inventar curent: {currentReport.name}</h6>
+          <h6>{appLabels.get("currentInventory")}: {currentReport.name}</h6>
         </CardSubtitle>  
         <Alert color="secondary" className="total-container" fade={false}>
-          <h6 className="total-container-item">Totalul de pachete: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
-          <h6 className="total-container-item">Cantitatea totală: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
-          <h6 className="total-container-item">Cantitatea medie per pachet: {getAverageQty()} (KG)</h6>
+          <h6 className="total-container-item">{appLabels.get("packagesTotal")}: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
+          <h6 className="total-container-item">{appLabels.get("packagesQty")}: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
+          <h6 className="total-container-item">{appLabels.get("packagesAvgQty")}: {getAverageQty()} (KG)</h6>
         </Alert>
       </CardBody>
       </Card>
@@ -100,16 +101,16 @@ const PackageManagement: FC<PackageManagementProps> = () => {
       {
         userHasAccess() ? 
           <CardTitle className="card-title">
-            <h4>Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?</h4>
+            <h4>{appMessages.get("noActiveInventoryAdminPckgs")}</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>Creați inventar nou</Button>
+              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
             </div>
           </CardTitle>   
         :
           <CardTitle className="card-title">
-            <h4>Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui.</h4>
+            <h4>{appMessages.get("noActiveInventoryPckgs")}</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>Mergeți la inventar</Button>
+              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
             </div>
         </CardTitle>   
       }    

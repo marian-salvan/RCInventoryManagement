@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { appLabels, appValidations } from '../../constants/messages.constants';
 import { EditQuantityStateModel } from '../../models/forms.models';
 import { ReportProductModel } from '../../models/reports.models';
 import { fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, quantityModalModel, setQuantityModalModel } from '../../reducers/app.reducer';
@@ -106,7 +107,7 @@ const QuantityModal: FC<QuantityModalProps> = () => {
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
-              <Label for="quantity">Cantitate ({getSelectedProductUnit()})</Label>
+              <Label for="quantity">{appLabels.get("qty")} ({getSelectedProductUnit()})</Label>
               <Input
                 autoFocus={true}
                 onChange={handleQuantityChange}
@@ -114,11 +115,11 @@ const QuantityModal: FC<QuantityModalProps> = () => {
                 type="number"
                 name="quantity"
                 id="quantity"
-                placeholder="Cantitate"
+                placeholder={appLabels.get("qty")}
                 invalid={ editQuantityModel.validQuantity !== null && !editQuantityModel.validQuantity }
               />
               <FormFeedback>
-                Cantitatea introdusă trebuie să fie mai mare decât 0
+                {appValidations.get("positiveInventoryQty")}
               </FormFeedback>
             </FormGroup>
           </Form>
@@ -130,7 +131,7 @@ const QuantityModal: FC<QuantityModalProps> = () => {
                   disabled={!(editQuantityModel.validQuantity)}>
                     {quantityModal?.buttonText}
            </Button>{' '}
-          <Button color="secondary" onClick={toggle}>Anulează</Button>
+          <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
   </div>

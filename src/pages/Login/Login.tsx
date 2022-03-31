@@ -1,9 +1,10 @@
 import { FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { FC, useEffect, useState, } from 'react';
-import { Location, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, CardSubtitle, CardTitle, Form, FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { emailRegex } from '../../constants/app.constants';
+import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
 import { LoginModel } from '../../models/login.model';
 import { firebaseApp, fireStoreDatabase, fromLocation, loggedInUserMetadata, loggedUser } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
@@ -78,11 +79,11 @@ const Login: FC<LoginProps> = () => {
     <div className="login">
       <Card>
         <CardBody>
-          <CardTitle><h4>CRR Cluj - Gestiunea donațiilor</h4></CardTitle>
-          <CardSubtitle><h5>Intră în cont</h5></CardSubtitle>
+          <CardTitle><h4>{appMessages.get("appTitleCrr")}</h4></CardTitle>
+          <CardSubtitle><h5>{appLabels.get("login")}</h5></CardSubtitle>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
-              <Label for="exampleEmail">Email</Label>
+              <Label for="exampleEmail">{appLabels.get("email")}</Label>
               <Input
                 onChange={handleEmailChange}
                 type="email"
@@ -92,11 +93,11 @@ const Login: FC<LoginProps> = () => {
                 placeholder="example@example.com"
               />
               <FormFeedback>
-               Emailul introdus nu este corect
+               {appValidations.get("incorrectEmail")}
               </FormFeedback>
             </FormGroup>
             <FormGroup>
-              <Label for="examplePassword">Parolă</Label>
+              <Label for="examplePassword">{appLabels.get("password")}</Label>
               <Input
                 onChange={handleInputChange}
                 type="password"
@@ -105,7 +106,7 @@ const Login: FC<LoginProps> = () => {
                 placeholder="********"
               />
             </FormGroup>
-            <Button disabled={!loginModel.valid} color="primary">Logare</Button>
+            <Button disabled={!loginModel.valid} color="primary">{appLabels.get("login")}</Button>
           </Form>
         </CardBody>
       </Card>

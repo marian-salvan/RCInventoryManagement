@@ -3,6 +3,11 @@
     color: #6d7fcc;
 }
 
+.bi.bi-dash-circle {
+    color: red;
+    cursor: pointer;
+}
+
 .inventory-table-header {
     display: flex;
     column-gap: 10px;

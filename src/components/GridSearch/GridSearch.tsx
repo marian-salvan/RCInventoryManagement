@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Input } from 'reactstrap';
+import { appMessages } from '../../constants/messages.constants';
 import { setGridSearchText } from '../../reducers/app.reducer';
 import { useAppDispatch } from '../../stores/hooks';
 import './GridSearch.css';
@@ -26,7 +27,7 @@ const GridSearch: FC<GridSearchProps> = () => {
              type="search" 
              name="search" 
              id="search"
-             placeholder="Caută după nume"/>   
+             placeholder={appMessages.get("searchByName")}/>   
     </div>
   );  
 

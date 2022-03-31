@@ -25,7 +25,7 @@ const createProductAsync = createAsyncThunk(
             const productsQuerrySnapshot = await getDocs(query(productsRef, where("name", "==", product.name)));
         
             if (productsQuerrySnapshot.docs.length > 0) {
-                return Promise.reject("Există deja un produs cu acest nume");
+                return Promise.reject(appErrors.get("existingProductName"));
             }
 
             const reportsRef = collection(db as Firestore, reportsCollection)

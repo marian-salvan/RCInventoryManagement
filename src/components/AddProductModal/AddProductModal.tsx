@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
 import { productTypesOptions, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
 import { MEASSUREMENT_UNITS, unitOptions } from '../../constants/units.constants';
 import { ProductAddStateModel } from '../../models/forms.models';
@@ -96,11 +97,11 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   return (
     <div>
       <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>Adaugă un produs nou</ModalHeader>
+        <ModalHeader toggle={toggle}>{appMessages.get("addModalTitle")}</ModalHeader>
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
-              <Label for="productName">Nume</Label>
+              <Label for="productName">{appLabels.get("name")}</Label>
               <Input
                 onChange={handleNameChange}
                 onKeyDown={handleKeyDown}
@@ -111,11 +112,11 @@ const AddProductModal: FC<AddProductModalProps> = () => {
                 invalid={ addProductModel.validName  !== null && !addProductModel.validName }
               />
               <FormFeedback>
-                Numele este obligatoriu
+              {appValidations.get("mandatoryName")}
               </FormFeedback>
             </FormGroup>
             <FormGroup>
-              <Label for="referencePrice">Preț de referință</Label>
+              <Label for="referencePrice">{appLabels.get("referencePrice")}</Label>
               <Input
                 onChange={handleReferencePriceChange}
                 onKeyDown={handleKeyDown}
@@ -126,11 +127,11 @@ const AddProductModal: FC<AddProductModalProps> = () => {
                 invalid={ addProductModel.validReferencePrice  !== null && !addProductModel.validReferencePrice }
               />
               <FormFeedback>
-                Prețul trebuie să fie mai mare decât 0
+                {appValidations.get("positivePrice")}
               </FormFeedback>
             </FormGroup>
             <FormGroup>
-              <Label for="unit">Categorie</Label>
+              <Label for="unit">{appLabels.get("category")}</Label>
               <Input type="select" name="type" id="type" onChange={handleInputChange}>
                 {
                   productTypesOptions.map(opt => (
@@ -140,7 +141,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               </Input>
             </FormGroup>
             <FormGroup>
-              <Label for="unit">Unitate de măsură</Label>
+              <Label for="unit">{appLabels.get("unit")}</Label>
               <Input type="select" name="unit" id="unit" onChange={handleInputChange}>
                 {
                   unitOptions.map(opt => (
@@ -152,8 +153,8 @@ const AddProductModal: FC<AddProductModalProps> = () => {
           </Form>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={saveProduct} disabled={!(addProductModel.validName && addProductModel.validReferencePrice)}>Salvează</Button>{' '}
-          <Button color="secondary" onClick={toggle}>Anulează</Button>
+          <Button color="primary" onClick={saveProduct} disabled={!(addProductModel.validName && addProductModel.validReferencePrice)}>{appLabels.get("save")}</Button>{' '}
+          <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
   </div>

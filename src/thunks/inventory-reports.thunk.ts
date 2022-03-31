@@ -44,11 +44,11 @@ const createActiveReportAsync = createAsyncThunk(
             const querrySnapshotName = await getDocs(query(invReportsRef, where("name", "==", inventoryReport.name)));
 
             if (querrySnapshot.docs.length > 0) {
-                return Promise.reject("Există deja un inventar activ");
+                return Promise.reject(appErrors.get("existingActiveInventory"));
             }
 
             if (querrySnapshotName.docs.length > 0) {
-                return Promise.reject("Există un inventar cu acest nume");
+                return Promise.reject(appErrors.get("existingInventoryName"));
             }
 
             const newPackDocRef = doc(collection(db as Firestore, packagesReportsCollection));
@@ -74,7 +74,7 @@ const addQtyFromProductAsync = createAsyncThunk(
             let productToBeUpdated = docToBeUpdated.inventory.find(p => p.uid === report.uid);
             
             if (!productToBeUpdated) {
-                return Promise.reject("Nu am găsit produsul în inventar");
+                return Promise.reject(appErrors.get("noProductInInventory"));
             }
 
             productToBeUpdated.quantity += report.quantity;
@@ -100,11 +100,11 @@ const removeQtyFromProductAsync = createAsyncThunk(
                 let productToBeUpdated = docToBeUpdated.inventory.find(p => p.uid === report.uid);
             
             if (!productToBeUpdated) {
-                return Promise.reject("Nu am găsit produsul în inventar");
+                return Promise.reject(appErrors.get("noProductInInventory"));
             }
 
             if (productToBeUpdated.quantity - report.quantity < 0) {
-                return Promise.reject("Stoc insuficient");
+                return Promise.reject(appErrors.get("insufficientStock"));
             }
 
             productToBeUpdated.quantity -= report.quantity;

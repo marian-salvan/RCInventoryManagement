@@ -18,12 +18,13 @@ import { closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryRep
 import  './Inventory.css';
 import { defaulPackagesReportModel, defaultInventoryReportModel } from '../../constants/default.configs';
 import { ROLES } from '../../constants/roles.enums';
-import { appMessages } from '../../constants/messages.constants';
+import { appLabels, appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { dowloadReport } from '../../helpers/reports.helper';
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
+import { app } from 'firebase-admin';
 
 interface InventoryProps {}
 
@@ -172,16 +173,16 @@ const Inventory: FC<InventoryProps> = () => {
          <Card>
           <CardBody>
             <CardTitle className="card-title">
-              <h4>Inventar curent: {currentInventoryReport.name}</h4>
+              <h4>{appLabels.get("currentInventory")}: {currentInventoryReport.name}</h4>
               {
                 userHasAccess() &&
                 <div className="button-container">
-                  <Button className="add-button" color="danger" onClick={() => showCloseConfirmationModal()}>Închide inventarul curent</Button>
-                  <Button className="add-button" color="primary" onClick={() => downloadReport()}>Descarcă raport intermediar</Button>
+                  <Button className="add-button" color="danger" onClick={() => showCloseConfirmationModal()}>{appLabels.get("closeCurrentInventory")}</Button>
+                  <Button className="add-button" color="primary" onClick={() => downloadReport()}>{appLabels.get("downloadIntemReport")}</Button>
                 </div>
               }
             </CardTitle>
-            <CardSubtitle><h6>Perioada: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
+            <CardSubtitle><h6>{appLabels.get("period")}: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
             <div className="inventory-table-header">
               <GridSearch />
               <GridCategoryFilter />
@@ -195,20 +196,20 @@ const Inventory: FC<InventoryProps> = () => {
                       {
                         orderByColumn === GRID_SORT_ENUM.NAME && <i className="bi bi-arrow-up"></i> 
                       }
-                      <span>Nume produs </span>
+                      <span>{appLabels.get("inventoryGridProduct")}</span>
                     </th>
                     <th className="grid-header-category" onClick={() => sortAfterColumn(GRID_SORT_ENUM.TYPE)}>
                       {
                         orderByColumn === GRID_SORT_ENUM.TYPE && <i className="bi bi-arrow-up"></i> 
                       }
-                      <span>Categorie</span>
+                      <span>{appLabels.get("inventoryGridCategory")}</span>
                     </th>
-                    <th>Unitate de măsură</th>
-                    { userHasAccess() && <th>Preț de referință</th> }
-                    <th>Cantitate curentă</th>
-                    { userHasAccess() && <th>Preț total</th> }
-                    <th>Șterge cantitate</th>
-                    <th>Adaugă cantitate</th>
+                    { userHasAccess() && <th>{appLabels.get("inventoryGridReferencePrice")}</th> }
+                    <th>{appLabels.get("inventoryGridQty")}</th>
+                    <th>{appLabels.get("inventoryGridUnit")}</th>
+                    { userHasAccess() && <th>{appLabels.get("inventoryGridTotalPrice")}</th> }
+                    <th>{appLabels.get("inventoryGridDeleteQty")}</th>
+                    <th>{appLabels.get("inventoryGridAddQty")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -218,9 +219,9 @@ const Inventory: FC<InventoryProps> = () => {
                       <th scope="row">{index + 1}</th>
                       <td>{product.name}</td>
                       <td>{product.type}</td>
-                      <td>{product.unit}</td>
                       { userHasAccess() && <td>{product.referencePrice }</td> }
-                      <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)} ({product.unit})</td>
+                      <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)}</td>
+                      <td>{product.unit}</td>
                       { userHasAccess() && <td>{(Math.round(product.totalPrice * 100) / 100).toFixed(2)}</td> }
                       <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
                       <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
@@ -244,14 +245,14 @@ const Inventory: FC<InventoryProps> = () => {
       <CardBody>
         { userHasAccess() ?  
           <CardTitle className="card-title">
-            <h4>Nu există un inventar activ. Doriți să creați unul?</h4>
+            <h4>{appMessages.get("noActiveInventoryAdmin")}</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => showCreateNewReportModal()}>Creați inventar nou</Button>
+              <Button className="add-button" color="primary" onClick={() => showCreateNewReportModal()}>{appLabels.get("newInventory")}</Button>
             </div>
           </CardTitle>   
         : 
           <CardTitle className="card-title">
-            <h4>Nu există un inventar activ. Contactați administratorul pentru crearea lui.</h4>
+            <h4>{appMessages.get("noActiveInventory")}</h4>
           </CardTitle>   
         }
       </CardBody>

@@ -59,10 +59,10 @@ const removePackagesAsync = createAsyncThunk(
             let docToBeUpdated = querrySnapshot.docs[0].data() as PacakagesReport;
             
             if (docToBeUpdated.packages.totalPackages - packageReport.totalPackages < 0) {
-                return Promise.reject("Stoc insuficient");
+                return Promise.reject(appErrors.get("insufficientStock"));
             }
             if (docToBeUpdated.packages.quantity - packageReport.quantity < 0) {
-                return Promise.reject("Stoc insuficient");
+                return Promise.reject(appErrors.get("insufficientStock"));
             }
 
             docToBeUpdated.packages.totalPackages -= packageReport.totalPackages;

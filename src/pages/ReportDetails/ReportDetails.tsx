@@ -5,6 +5,7 @@ import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationMo
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
+import { appLabels } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
@@ -70,16 +71,16 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
        <Card>
         <CardBody>
           <CardTitle className="card-title">
-            <h4>Inventar: {inventoryReport?.name}</h4>
+            <h4>{appLabels.get("inventory")}: {inventoryReport?.name}</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => downloadReport()}>Descarcă raportul</Button>
+              <Button className="add-button" color="primary" onClick={() => downloadReport()}>{appLabels.get("downloadReport")}</Button>
             </div>
           </CardTitle>
           <CardSubtitle>
-            <h6>Perioada: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
-            <h6>Nr total de pachete: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
-            <h6>Cantitate : {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
-            <h6>Cantitatea medie per pachet: {getAverageQty()} (KG)</h6>
+            <h6>{appLabels.get("period")}: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
+            <h6>{appLabels.get("packagesTotal")}: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
+            <h6>{appLabels.get("packagesQty")}: {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
+            <h6>{appLabels.get("packagesAvgQty")}: {getAverageQty()} (KG)</h6>
           </CardSubtitle>
           <div className="report-details-table-header">
               <GridCategoryFilter />
@@ -89,15 +90,15 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Nume produs</th>
+                  <th>{appLabels.get("inventoryGridProduct")}</th>
                   <th>
                     <i className="bi bi-arrow-up"></i>
-                    <span>Categorie</span>
+                    <span>{appLabels.get("inventoryGridCategory")}</span>
                   </th>
-                  <th>Unitate de măsură</th>
-                  <th>Preț de referință</th>
-                  <th>Cantitate totată</th>
-                  <th>Preț total</th>
+                  <th>{appLabels.get("inventoryGridUnit")}</th>
+                  <th>{appLabels.get("inventoryGridReferencePrice")}</th>
+                  <th>{appLabels.get("inventoryGridTotalQty")}</th>
+                  <th>{appLabels.get("inventoryGridTotalPrice")}</th>
                 </tr>
               </thead>
               <tbody>

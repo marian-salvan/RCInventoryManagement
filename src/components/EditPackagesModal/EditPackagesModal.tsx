@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { appLabels, appValidations } from '../../constants/messages.constants';
 import { EditPackagesStateModel } from '../../models/forms.models';
 import { ReportPackageModel } from '../../models/reports.models';
 import { fireStoreDatabase, packagesModalModel, setPackagesModalModel } from '../../reducers/app.reducer';
@@ -103,7 +104,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
           <FormGroup>
-              <Label for="totalPackages">Număr de pachete</Label>
+              <Label for="totalPackages">{appLabels.get("packageNumber")}</Label>
               <Input
                 onChange={handleTotalPackagesChange}
                 onKeyDown={handleKeyDown}
@@ -115,11 +116,11 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
                 invalid={ editPackagesStateModel.validTotalPackages !== null && !editPackagesStateModel.validTotalPackages }
               />
               <FormFeedback>
-                Numărul de pachete introdus trebuie să fie mai mare sau egal cu 0
+                {appValidations.get("positivePackageNumber")}
               </FormFeedback>
             </FormGroup>
             <FormGroup>
-              <Label for="quantity">Cantitate (KG)</Label>
+              <Label for="quantity">{appLabels.get("packageQty")}</Label>
               <Input
                 onChange={handleQuantityChange}
                 onKeyDown={handleKeyDown}
@@ -130,7 +131,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
                 invalid={ editPackagesStateModel.validQuantity !== null && !editPackagesStateModel.validQuantity }
               />
               <FormFeedback>
-                Cantitatea introdusă trebuie să fie mai mare sau egală cu 0
+                {appValidations.get("positivePackageQty")}
               </FormFeedback>
             </FormGroup>
           </Form>
@@ -141,7 +142,7 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
                   disabled={isButtonDisabled()}>
                   {editPackageModel?.buttonText}
           </Button>
-          <Button color="secondary" onClick={toggle}>Anulează</Button>
+          <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
   </div>

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { appErrors } from '../../constants/messages.constants';
+import { appErrors, appLabels } from '../../constants/messages.constants';
 import { errorModalModel, setErrorModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';import  './ErrorModal.css';
 
@@ -22,10 +22,10 @@ const ErrorModal: FC<ErrorModalProps> = () =>
   return (
     <div>
       <Modal isOpen={modalModel.showError} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>Eroare</ModalHeader>
+        <ModalHeader toggle={toggle}>{appLabels.get("errorTitle")}</ModalHeader>
         <ModalBody>{modalModel.errorMesage}</ModalBody>
         <ModalFooter>
-          <Button color="danger" onClick={confirm}>OK</Button>
+          <Button color="danger" onClick={confirm}>{appLabels.get("errorConfirm")}</Button>
         </ModalFooter>
       </Modal>
     </div>
