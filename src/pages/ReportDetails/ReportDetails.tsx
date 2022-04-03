@@ -47,7 +47,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     if (inventoryReport) {
       const reports = inventoryReport.inventory.map(product => {
         return {...product, type: productTypesEngToRoMap.get(product.type) as string};
-      }).sort(getProductModelSortingFunc(GRID_SORT_ENUM.NAME));
+      }).sort(getProductModelSortingFunc(GRID_SORT_ENUM.TYPE));
 
       (categoryFilter !== null) ? setDisplayInventory(reports.filter(x => x.type === categoryFilter)) :
                                   setDisplayInventory(reports);
