@@ -1,13 +1,15 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
-import AddProductModal from '../../components/AddProductModal/AddProductModal';
+import AddEditProductModal from '../../components/AddEditProductModal/AddEditProductModal';
 import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
 import GridSearch from '../../components/GridSearch/GridSearch';
 import { appLabels, appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ROLES } from '../../constants/roles.enums';
 import { ProductModel } from '../../models/products.models';
-import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata, productToBeAdded, reloadProductsTable, setActionAccepted, setAddProductModal, setConfirmationModal, setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setReloadProductsTable } from '../../reducers/app.reducer';
+import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata,
+   productToBeAdded, reloadProductsTable, setActionAccepted, setAddEditProductModal, setConfirmationModal,
+   setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setProductToBeEdited, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
 import './Products.css';
@@ -83,11 +85,12 @@ const Products: FC<ProductsProps> = () => {
   }
 
   const editProduct = (product: ProductModel) => {
-  
+    dispatch(setProductToBeEdited(product));
+    dispatch(setAddEditProductModal(false));
   }
 
   const showAddModal = () => {
-    dispatch(setAddProductModal());
+    dispatch(setAddEditProductModal(true));
   }
 
   const userHasAccess = (): boolean => {
@@ -140,7 +143,7 @@ const Products: FC<ProductsProps> = () => {
           </div> 
         </CardBody>
       </Card>
-      <AddProductModal />
+      <AddEditProductModal />
       <ConfirmationModal />
     </div>
   );

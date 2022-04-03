@@ -16,11 +16,12 @@ export interface AppState {
     database: Firestore | null;
     loggedInUserMetadata: UserMetadataModel | null;
     allProducts: ProductModel[] | null;
-    showAddProductModal: boolean;
+    showAddEditProductModal: boolean | null;
     showConfirmationModal: boolean;
     confirmationModalModel: ConfirmationModalModel;
     actionAccepted: boolean;
     productToBeAdded: ProductModel | null;
+    productToBeEdited: ProductModel | null;
     reloadProductsTable: boolean;
     reloadReportsTable: boolean;
     activeInventoryReport: InventoryReport | null;
@@ -48,7 +49,7 @@ export const initialState: AppState = {
     database: null,
     loggedInUserMetadata: null,
     allProducts: null,
-    showAddProductModal: false,
+    showAddEditProductModal: null,
     showConfirmationModal: false,
     confirmationModalModel: {
         title: appMessages.get("confirmationModalDefaultTitle") as string,
@@ -57,6 +58,7 @@ export const initialState: AppState = {
     },
     actionAccepted: false,
     productToBeAdded: null,
+    productToBeEdited: null,
     reloadProductsTable: false,
     reloadReportsTable: false,
     activeInventoryReport: null,

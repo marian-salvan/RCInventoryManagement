@@ -24,9 +24,8 @@
 }
 
 .sidebar-header .logo-container .logo-image {
-  width: 40%;
+  width: 60%;
   height: auto;
-  padding: 1em;
 }
 
 .sidebar-header .logo-container h4 {
@@ -90,7 +89,6 @@ li a.dropdown-toggle::after {
 
 .side-menu {
   min-height: 600px;
-  height: calc(100vh - 170px);
   overflow-y: scroll;
 }
 

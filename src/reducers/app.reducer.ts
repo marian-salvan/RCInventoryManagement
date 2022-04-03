@@ -8,7 +8,7 @@ import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
-import { getAllProductsAsync, createProductAsync, deleteProductAsync} from '../thunks/products.thunk';
+import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync} from '../thunks/products.thunk';
 import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync, getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 import { addPackagesAsync, getActivePackagesReportsAsync, getPackagesReportsByUidAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
@@ -35,8 +35,8 @@ export const appSlice = createSlice({
     setLoggedInUser: (state, action: PayloadAction<User | null>) => {
       state.loggedUser = action.payload;
     },
-    setAddProductModal: (state) => {
-      state.showAddProductModal = !state.showAddProductModal;
+    setAddEditProductModal: (state, action: PayloadAction<boolean | null>) => {
+      state.showAddEditProductModal = action.payload;
     },
     setConfirmationModal: (state) => {
       state.showConfirmationModal = !state.showConfirmationModal;
@@ -49,6 +49,9 @@ export const appSlice = createSlice({
     },
     setProductToBeAdded: (state, action: PayloadAction<ProductModel | null>) => {
       state.productToBeAdded = action.payload;
+    },
+    setProductToBeEdited: (state, action: PayloadAction<ProductModel | null>) => {
+      state.productToBeEdited = action.payload;
     },
     setReloadProductsTable: (state) => {
       state.reloadProductsTable = !state.reloadProductsTable;
@@ -150,6 +153,19 @@ export const appSlice = createSlice({
         state.showLoader = false;
       })
       .addCase(createProductAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      .addCase(editProductAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(editProductAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(editProductAsync.rejected, (state, action) => {
         state.showLoader = false;
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
@@ -350,15 +366,15 @@ export const appSlice = createSlice({
 });
 
 export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
-  setAddProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
-  setProductToBeAdded, setReloadProductsTable, setReloadReportsTable, setNewReportName,
+  setAddEditProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
+  setProductToBeAdded, setProductToBeEdited, setReloadProductsTable, setReloadReportsTable, setNewReportName,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
   setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
 export const sideBarIsOpen = (state: RootState) => state.appReducer.sideBarIsOpen;
-export const showAddProductModal = (state: RootState) => state.appReducer.showAddProductModal;
+export const showAddEditProductModal = (state: RootState) => state.appReducer.showAddEditProductModal;
 export const showConfirmationModal = (state: RootState) => state.appReducer.showConfirmationModal;
 export const actionAccepted = (state: RootState) => state.appReducer.actionAccepted;
 export const confirmationModalModel = (state: RootState) => state.appReducer.confirmationModalModel;
@@ -368,6 +384,7 @@ export const fireStoreDatabase = (state: RootState) => state.appReducer.database
 export const loggedInUserMetadata = (state: RootState) => state.appReducer.loggedInUserMetadata;
 export const allProducts = (state: RootState) => state.appReducer.allProducts;
 export const productToBeAdded = (state: RootState) => state.appReducer.productToBeAdded;
+export const productToBeEdited = (state: RootState) => state.appReducer.productToBeEdited;
 export const reloadProductsTable = (state: RootState) => state.appReducer.reloadProductsTable;
 export const reloadReportsTable = (state: RootState) => state.appReducer.reloadReportsTable;
 export const activeInventoryReport = (state: RootState) => state.appReducer.activeInventoryReport;

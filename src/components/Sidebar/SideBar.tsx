@@ -39,7 +39,7 @@ const SideBar = () => {
           &times;
         </span>
         <div className="logo-container">
-          <img className="logo-image" src="/logo-full.png" />
+          <img className="logo-image" src="/round-logo.png" />
           <h4>{appMessages.get("appTitle")}</h4>
         </div>
       </div>

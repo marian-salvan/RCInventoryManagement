@@ -1,20 +1,24 @@
-import { FC, useState } from 'react';
+import { app } from 'firebase-admin';
+import { FC, useEffect, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
-import { productTypesOptions, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
+import { productTypesEngToRoMap, productTypesOptions, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
 import { MEASSUREMENT_UNITS, unitOptions } from '../../constants/units.constants';
 import { ProductAddStateModel } from '../../models/forms.models';
 import { ProductModel } from '../../models/products.models';
-import { setAddProductModal, setProductToBeAdded, showAddProductModal } from '../../reducers/app.reducer';
+import { fireStoreDatabase, productToBeEdited, setAddEditProductModal, setProductToBeAdded, setProductToBeEdited, showAddEditProductModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import './AddProductModal.css';
+import { editProductAsync } from '../../thunks/products.thunk';
+import './AddEditProductModal.css';
 
 interface AddProductModalProps {}
 
 const AddProductModal: FC<AddProductModalProps> = () => {
   const dispatch = useAppDispatch();
-  const showModal = useAppSelector(showAddProductModal);
-  const [addProductModel, setAddProductMode] = useState<ProductAddStateModel>({
+  const db = useAppSelector(fireStoreDatabase);
+  const saveEdit = useAppSelector(showAddEditProductModal);
+  const prdToBeEdited = useAppSelector(productToBeEdited);
+  const [addProductModel, setAddProductModel] = useState<ProductAddStateModel>({
     uid: "",
     name: "",
     referencePrice: 0,
@@ -25,8 +29,9 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   });
   
   const toggle = () => {
-    dispatch(setAddProductModal());
-    setAddProductMode(
+    dispatch(setAddEditProductModal(null));
+    dispatch(setProductToBeEdited(null));
+    setAddProductModel(
       {
         uid: "",
         name: "",
@@ -38,12 +43,30 @@ const AddProductModal: FC<AddProductModalProps> = () => {
       }
     );
   }
+  
+  useEffect(() => {
+    if (prdToBeEdited && !saveEdit) {
+      debugger
+      setAddProductModel(
+        {
+          uid: prdToBeEdited.uid,
+          name: prdToBeEdited.name,
+          referencePrice: prdToBeEdited.referencePrice,
+          validName: true,
+          validReferencePrice: true,
+          type: productTypesEngToRoMap.get(prdToBeEdited.type) as string,
+          unit: prdToBeEdited.unit
+        }
+      );
+    }
+  }, [prdToBeEdited])
+  
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value as string;
 
-    setAddProductMode({
+    setAddProductModel({
       ...addProductModel,
       [name]: value
     });
@@ -70,17 +93,30 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   }
 
   const saveProduct = () => {
-    const { v4: uuidv4 } = require('uuid');
+    if (saveEdit) {
+      const { v4: uuidv4 } = require('uuid');
 
-    const product: ProductModel = { 
-      uid: uuidv4(),
-      name: addProductModel.name.toLocaleLowerCase(), 
-      referencePrice: addProductModel.referencePrice, 
-      unit: addProductModel.unit,
-      type: productTypesRoToEngMap.get(addProductModel.type) as string
-    };
+      const product: ProductModel = { 
+        uid: uuidv4(),
+        name: addProductModel.name.toLocaleLowerCase(), 
+        referencePrice: addProductModel.referencePrice as number, 
+        unit: addProductModel.unit,
+        type: productTypesRoToEngMap.get(addProductModel.type) as string
+      };
+  
+      dispatch(setProductToBeAdded(product));
+    } else {
+      const product: ProductModel =  {
+        uid: addProductModel.uid,
+        name: addProductModel.name, 
+        referencePrice: addProductModel.referencePrice, 
+        unit: addProductModel.unit,
+        type: productTypesRoToEngMap.get(addProductModel.type) as string,
+      };
 
-    dispatch(setProductToBeAdded(product));
+      dispatch(editProductAsync({db, product}));
+    }
+
     toggle();
   }
 
@@ -94,10 +130,15 @@ const AddProductModal: FC<AddProductModalProps> = () => {
     }
   }
 
+  const getHeaderTitle = (): string => {
+    return saveEdit ? appMessages.get("addModalTitle") as string : 
+                     `${appMessages.get("editModalTitle") as string} ${addProductModel.name}`;
+  }
+
   return (
     <div>
-      <Modal isOpen={showModal} toggle={toggle} className="add-product-modal">
-        <ModalHeader toggle={toggle}>{appMessages.get("addModalTitle")}</ModalHeader>
+      <Modal isOpen={saveEdit !== null} toggle={toggle} className="add-product-modal">
+        <ModalHeader toggle={toggle}>{ getHeaderTitle() }</ModalHeader>
         <ModalBody>
           <Form className="form" onSubmit={handleSubmit}>
             <FormGroup>
@@ -109,6 +150,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
                 name="name"
                 id="productName"
                 placeholder="Nume"
+                value={addProductModel.name}
                 invalid={ addProductModel.validName  !== null && !addProductModel.validName }
               />
               <FormFeedback>
@@ -124,6 +166,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
                 name="referencePrice"
                 id="referencePrice"
                 placeholder="Preț de referință"
+                value={addProductModel.referencePrice as number}
                 invalid={ addProductModel.validReferencePrice  !== null && !addProductModel.validReferencePrice }
               />
               <FormFeedback>
@@ -132,7 +175,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
             </FormGroup>
             <FormGroup>
               <Label for="unit">{appLabels.get("category")}</Label>
-              <Input type="select" name="type" id="type" onChange={handleInputChange}>
+              <Input type="select" name="type" id="type" onChange={handleInputChange} value={addProductModel.type}>
                 {
                   productTypesOptions.map(opt => (
                     <option key={opt}>{opt}</option>
@@ -142,7 +185,7 @@ const AddProductModal: FC<AddProductModalProps> = () => {
             </FormGroup>
             <FormGroup>
               <Label for="unit">{appLabels.get("unit")}</Label>
-              <Input type="select" name="unit" id="unit" onChange={handleInputChange}>
+              <Input type="select" name="unit" id="unit" onChange={handleInputChange}  value={addProductModel.unit}>
                 {
                   unitOptions.map(opt => (
                     <option key={opt}>{opt}</option>
@@ -150,10 +193,20 @@ const AddProductModal: FC<AddProductModalProps> = () => {
                 }
               </Input>
             </FormGroup>
+            {
+              !saveEdit && 
+              <FormGroup>
+                <span className="edit-warning">{appMessages.get("editWarning")}</span>
+              </FormGroup>
+            }    
           </Form>
+         
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={saveProduct} disabled={!(addProductModel.validName && addProductModel.validReferencePrice)}>{appLabels.get("save")}</Button>{' '}
+          <Button color="primary" onClick={saveProduct} 
+                  disabled={!(addProductModel.validName && addProductModel.validReferencePrice)}>
+                    { saveEdit ? appLabels.get("save") : appLabels.get("edit") }
+          </Button>{' '}
           <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
