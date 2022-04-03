@@ -77,7 +77,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
             </div>
           </CardTitle>
           <CardSubtitle>
-            <h6>{appLabels.get("period")}: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
+            <h6>{appLabels.get("period")}: {convertTimeStampToDateString(inventoryReport?.fromDate.seconds as number)} - {convertTimeStampToDateString(inventoryReport?.toDate?.seconds as number)}</h6>
             <h6>{appLabels.get("packagesTotal")}: {(Math.round(packagesReport?.packages.totalPackages as number * 100) / 100).toFixed(2)  } </h6>
             <h6>{appLabels.get("packagesQty")}: {(Math.round(packagesReport?.packages.quantity as number * 100) / 100).toFixed(2)} (KG)</h6>
             <h6>{appLabels.get("packagesAvgQty")}: {getAverageQty()} (KG)</h6>
