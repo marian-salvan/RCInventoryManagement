@@ -122,6 +122,8 @@ export const appSlice = createSlice({
       })
       .addCase(getLoggedInUserMetaDataAsync.fulfilled, (state, action) => {
         state.loggedInUserMetadata = action.payload.docs[0].data() as UserMetadataModel;
+
+        console.log(state.loggedInUserMetadata)
         state.showLoader = false;
       })
       .addCase(getLoggedInUserMetaDataAsync.rejected, (state, action) => {

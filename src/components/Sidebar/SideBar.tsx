@@ -66,6 +66,11 @@ const SideBar = () => {
               <i className="bi bi-files"></i> {appMessages.get("reportsTitle")}
             </NavLink>
           </NavItem>
+          <NavItem className={checkActiveRoute("/settings") ? "active-route" : ""}>
+            <NavLink tag={Link} to={"/settings"}>
+            <i className="bi bi-gear"></i> {appMessages.get("settings")}
+            </NavLink>
+          </NavItem>
           <NavItem>
             <NavLink onClick={ () => logOut()}><i className="bi bi-power"></i> {appMessages.get("logOutTitle")}</NavLink>
           </NavItem>

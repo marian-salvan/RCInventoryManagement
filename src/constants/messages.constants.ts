@@ -31,7 +31,8 @@ export const appMessages = new Map<string, string>([
   ["noActiveInventory", "Nu există un inventar activ. Contactați administratorul pentru crearea lui."],
   ["noActiveInventoryAdminPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?"],
   ["noActiveInventoryPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui."],
-  ["editWarning", "Datele acestui produs vor fi schimbate și în inventarul activ. Sigur doriți să efectuați această operație?"]
+  ["editWarning", "Datele acestui produs vor fi schimbate și în inventarul activ. Sigur doriți să efectuați această operație?"],
+  ["settings", "Setări"]
 ])
 
 export const appErrors = new Map<string, string>([

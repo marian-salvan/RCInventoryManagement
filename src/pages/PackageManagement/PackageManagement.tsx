@@ -71,23 +71,23 @@ const PackageManagement: FC<PackageManagementProps> = () => {
     return (
       <div className="products-container">
       <Card>
-      <CardBody>
-        <CardTitle className="card-title">
-          <h4>{appLabels.get("addPackages")}</h4>
-          <div className="button-container">
-            <Button className="add-button" color="danger" onClick={() => openRemovePackagesModal()}>{appLabels.get("deletePackages")}</Button>
-            <Button className="add-button" color="primary" onClick={() => openAddPackagesModal()}>{appLabels.get("addPackages")}</Button>
-          </div>
-        </CardTitle>   
-        <CardSubtitle className="card-title">
-          <h6>{appLabels.get("currentInventory")}: {currentReport.name}</h6>
-        </CardSubtitle>  
-        <Alert color="secondary" className="total-container" fade={false}>
-          <h6 className="total-container-item">{appLabels.get("packagesTotal")}: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
-          <h6 className="total-container-item">{appLabels.get("packagesQty")}: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
-          <h6 className="total-container-item">{appLabels.get("packagesAvgQty")}: {getAverageQty()} (KG)</h6>
-        </Alert>
-      </CardBody>
+        <CardBody>
+          <CardTitle className="card-title">
+            <h4>{appLabels.get("addPackages")}</h4>
+            <div className="button-container">
+              <Button className="add-button" color="danger" onClick={() => openRemovePackagesModal()}>{appLabels.get("deletePackages")}</Button>
+              <Button className="add-button" color="primary" onClick={() => openAddPackagesModal()}>{appLabels.get("addPackages")}</Button>
+            </div>
+          </CardTitle>   
+          <CardSubtitle className="card-title">
+            <h6>{appLabels.get("currentInventory")}: {currentReport.name}</h6>
+          </CardSubtitle>  
+          <Alert color="secondary" className="total-container" fade={false}>
+            <h6 className="total-container-item">{appLabels.get("packagesTotal")}: {(Math.round(currentReport.packages.totalPackages * 100) / 100).toFixed(2)}</h6>
+            <h6 className="total-container-item">{appLabels.get("packagesQty")}: {(Math.round(currentReport.packages.quantity * 100) / 100).toFixed(2)} (KG)</h6>
+            <h6 className="total-container-item">{appLabels.get("packagesAvgQty")}: {getAverageQty()} (KG)</h6>
+          </Alert>
+        </CardBody>
       </Card>
        <EditPackagesModal />
     </div>
@@ -97,24 +97,24 @@ const PackageManagement: FC<PackageManagementProps> = () => {
   return (
     <div className="products-container">
     <Card>
-    <CardBody>
-      {
-        userHasAccess() ? 
-          <CardTitle className="card-title">
-            <h4>{appMessages.get("noActiveInventoryAdminPckgs")}</h4>
-            <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
-            </div>
+      <CardBody>
+        {
+          userHasAccess() ? 
+            <CardTitle className="card-title">
+              <h4>{appMessages.get("noActiveInventoryAdminPckgs")}</h4>
+              <div className="button-container">
+                <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
+              </div>
+            </CardTitle>   
+          :
+            <CardTitle className="card-title">
+              <h4>{appMessages.get("noActiveInventoryPckgs")}</h4>
+              <div className="button-container">
+                <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
+              </div>
           </CardTitle>   
-        :
-          <CardTitle className="card-title">
-            <h4>{appMessages.get("noActiveInventoryPckgs")}</h4>
-            <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => gotToInvetoryPage()}>{appLabels.get("goToInventory")}</Button>
-            </div>
-        </CardTitle>   
-      }    
-    </CardBody>
+        }    
+      </CardBody>
     </Card>
     <ConfirmationModal />
   </div>
