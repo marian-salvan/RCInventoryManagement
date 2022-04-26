@@ -32,7 +32,9 @@ export const appMessages = new Map<string, string>([
   ["noActiveInventoryAdminPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?"],
   ["noActiveInventoryPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui."],
   ["editWarning", "Datele acestui produs vor fi schimbate și în inventarul activ. Sigur doriți să efectuați această operație?"],
-  ["settings", "Setări"]
+  ["campaigns", "Campanii"],
+  ["createNewCampaigTitle", "Creați campanie"],
+  
 ])
 
 export const appErrors = new Map<string, string>([
@@ -42,6 +44,7 @@ export const appErrors = new Map<string, string>([
     ["noProductInInventory", "Nu am găsit produsul în inventar"],
     ["insufficientStock", "Stoc insuficient"],
     ["existingProductName", "Există deja un produs cu acest nume"],
+    ["existingCampaignName", "Există deja o campanie cu acest nume"]
 ]);
 
 export const appLabels = new Map<string, string>([
@@ -94,7 +97,9 @@ export const appLabels = new Map<string, string>([
   ["reportsGridOpenDate", "Data deschiderii"],
   ["reportsGridCloseDate", "Data închidere"],
   ["reportsGridSeeReport", "Vezi raportul"],
-  ["edit", "Editează"]
+  ["edit", "Editează"],
+  ["addToInventory", "Adaugă produsul la inventarul activ"],
+  ["campaignName", "Nume campanie"]
 ]);
 
 export const appValidations  = new Map<string, string>([

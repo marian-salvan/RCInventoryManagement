@@ -2,6 +2,7 @@ import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
 import { appErrors, appMessages } from '../constants/messages.constants';
+import { CampaignModel } from '../models/campaigns.models';
 import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
 import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/reports.models';
@@ -38,6 +39,10 @@ export interface AppState {
     selectedPackageReport: PacakagesReport | null;
     errorModalModel: ErrorModalModel;
     gridCategoryFilter: string | null;
+    campaigns: CampaignModel[] | null;
+    showNewCampaignModal: boolean;
+    newCampaign: CampaignModel | null;
+    reloadCampaignTable: boolean;
 }
   
 export const initialState: AppState = {
@@ -77,5 +82,9 @@ export const initialState: AppState = {
         showError: false,
         errorMesage: appErrors.get("genericErrorMessage") as string,
     },
-    gridCategoryFilter: null
+    gridCategoryFilter: null,
+    campaigns: null,
+    showNewCampaignModal: false,
+    newCampaign: null,
+    reloadCampaignTable: false
 };

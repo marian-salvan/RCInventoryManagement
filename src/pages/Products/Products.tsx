@@ -89,6 +89,10 @@ const Products: FC<ProductsProps> = () => {
     dispatch(setAddEditProductModal(false));
   }
 
+  const addProductToInventory = (product: ProductModel) => {
+
+  }
+
   const showAddModal = () => {
     dispatch(setAddEditProductModal(true));
   }
@@ -122,6 +126,7 @@ const Products: FC<ProductsProps> = () => {
                   <th>{appLabels.get("inventoryGridUnit")}</th>
                   { userHasAccess() && <th>{appLabels.get("deleteProduct")}</th> }
                   { userHasAccess() && <th>{appLabels.get("editProduct")}</th> }
+                  { userHasAccess() && <th>{appLabels.get("addToInventory")}</th> }
                 </tr>
               </thead>
               <tbody>
@@ -135,6 +140,7 @@ const Products: FC<ProductsProps> = () => {
                     <td>{product.unit}</td>
                     { userHasAccess() && <td onClick={() => deleteProduct(product)}><i className="bi bi-x-circle" title={appLabels.get("deleteProduct")}></i></td> }
                     { userHasAccess() && <td onClick={() => editProduct(product)}><i className="bi bi-pencil-fill" title={appLabels.get("editProduct")}></i></td> }
+                    { userHasAccess() && <td onClick={() => addProductToInventory(product)}><i className="bi bi-clipboard2-plus" title={appLabels.get("addToInventory")}></i></td> }
                   </tr>
                   ))
                 }

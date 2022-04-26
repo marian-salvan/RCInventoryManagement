@@ -19,14 +19,14 @@ const TopBar: FC<TopBarProps> = () => {
         navbar
       >
         <NavbarText>
-          Campania curenta: 
+          Campania selectata: 
         </NavbarText>
         <UncontrolledDropdown direction='down'>
           <DropdownToggle caret nav>
             Options
           </DropdownToggle>
           <DropdownMenu>
-            <DropdownItem>
+            <DropdownItem active={true}>
               Option 1
             </DropdownItem>
             <DropdownItem>

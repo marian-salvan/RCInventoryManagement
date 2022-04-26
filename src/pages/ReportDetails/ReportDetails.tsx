@@ -7,7 +7,7 @@ import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { appLabels } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
-import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
+import { convertTimeStampToDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 import { ReportProductModel } from '../../models/reports.models';

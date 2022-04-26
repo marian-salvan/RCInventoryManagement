@@ -21,3 +21,8 @@ export interface EditPackagesStateModel {
     validQuantity: boolean | null;
     validTotalPackages: boolean | null;
 }
+
+export interface NewCampaignStateModel {
+    name: string;
+    validName: boolean | null;
+}

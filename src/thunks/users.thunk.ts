@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { doc, Firestore, collection,  getDoc, getDocs, query, where } from "firebase/firestore";
+import { Firestore, collection, getDocs, query, where } from "firebase/firestore";
 
 const usersCollection = "users";
 

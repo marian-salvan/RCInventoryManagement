@@ -8,10 +8,3 @@ export interface OrganiationModel {
     orgId: string;
     orgName: string;
 }
-
-export interface UserSettings {
-    settingId: string;
-    orgId: string;
-    name: string;
-    value: string;
-}

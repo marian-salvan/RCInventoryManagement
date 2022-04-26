@@ -9,11 +9,15 @@ import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
 import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync} from '../thunks/products.thunk';
-import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync, getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
+import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync,
+         getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync,
+         getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 import { addPackagesAsync, getActivePackagesReportsAsync, getPackagesReportsByUidAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
 import { initialState } from './app.state';
 import { appErrors } from '../constants/messages.constants';
+import { createCampaignAsync, getAllCampaignsForOrgAsync } from '../thunks/campaigns.thunk';
+import { CampaignModel } from '../models/campaigns.models';
 
 export const appSlice = createSlice({
   name: 'app',
@@ -85,7 +89,16 @@ export const appSlice = createSlice({
     },
     setGridCategoryFilter: (state, action: PayloadAction<string | null>) => {
       state.gridCategoryFilter = action.payload;
-    }
+    },
+    setNewCampaignModal: (state) => {
+      state.showNewCampaignModal = !state.showNewCampaignModal;
+    },
+    setNewCampaign: (state, action: PayloadAction<CampaignModel | null>) => {
+      state.newCampaign = action.payload;
+    },
+    setReloadCampaignTable: (state) => {
+      state.reloadCampaignTable = !state.reloadCampaignTable;
+    },  
   },
   extraReducers: (builder) => {
     builder
@@ -122,8 +135,6 @@ export const appSlice = createSlice({
       })
       .addCase(getLoggedInUserMetaDataAsync.fulfilled, (state, action) => {
         state.loggedInUserMetadata = action.payload.docs[0].data() as UserMetadataModel;
-
-        console.log(state.loggedInUserMetadata)
         state.showLoader = false;
       })
       .addCase(getLoggedInUserMetaDataAsync.rejected, (state, action) => {
@@ -364,14 +375,54 @@ export const appSlice = createSlice({
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
-  },
+
+      //campaigns
+      .addCase(getAllCampaignsForOrgAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(getAllCampaignsForOrgAsync.fulfilled, (state, action) => {
+        if (action.payload.docs.length > 0) {
+          const campaigns: CampaignModel[] = [];
+  
+          action.payload.docs.forEach(doc => {
+            campaigns.push(doc.data() as CampaignModel);
+          });
+
+          state.campaigns = campaigns;
+        } else {
+          state.campaigns = null
+        }
+        state.showLoader = false;
+      })
+      .addCase(getAllCampaignsForOrgAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+
+      .addCase(createCampaignAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(createCampaignAsync.fulfilled, (state, action) => {
+        state.reloadCampaignTable = true;
+        state.showLoader = false;
+      })
+      .addCase(createCampaignAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })     
+    },
 });
 
 export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
   setAddEditProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
   setProductToBeAdded, setProductToBeEdited, setReloadProductsTable, setReloadReportsTable, setNewReportName,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
-  setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter } = appSlice.actions;
+  setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter, setNewCampaignModal,
+  setNewCampaign, setReloadCampaignTable } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -403,5 +454,9 @@ export const selectedInventoryReport = (state: RootState) => state.appReducer.se
 export const selectedPackageReport = (state: RootState) => state.appReducer.selectedPackageReport;
 export const errorModalModel = (state: RootState) => state.appReducer.errorModalModel;
 export const gridCategoryFilter = (state: RootState) => state.appReducer.gridCategoryFilter;
+export const campaigns = (state: RootState) => state.appReducer.campaigns;
+export const showNewCampaignModal = (state: RootState) => state.appReducer.showNewCampaignModal;
+export const newCampaign = (state: RootState) => state.appReducer.newCampaign;
+export const reloadCampaignTable = (state: RootState) => state.appReducer.reloadCampaignTable;
 
 export default appSlice.reducer;

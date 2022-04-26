@@ -88,7 +88,6 @@ const editProductAsync = createAsyncThunk(
     }
 )
 
-
 const deleteProductAsync = createAsyncThunk(
     'app/deleteProductAsync',
     async ({db, uid}: {db: Firestore | null, uid: string}) => {

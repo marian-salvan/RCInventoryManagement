@@ -53,7 +53,7 @@ const SideBar = () => {
           </NavItem>
           <NavItem className={checkActiveRoute("/inventory") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/inventory"} >
-            <i className="bi bi-list-ul"></i> {appMessages.get("inventoryTitle")}  
+            <i className="bi bi-clipboard2"></i> {appMessages.get("inventoryTitle")}  
             </NavLink>
           </NavItem>
           <NavItem className={checkActiveRoute("/package-management") ? "active-route" : ""}>
@@ -66,9 +66,9 @@ const SideBar = () => {
               <i className="bi bi-files"></i> {appMessages.get("reportsTitle")}
             </NavLink>
           </NavItem>
-          <NavItem className={checkActiveRoute("/settings") ? "active-route" : ""}>
-            <NavLink tag={Link} to={"/settings"}>
-            <i className="bi bi-gear"></i> {appMessages.get("settings")}
+          <NavItem className={checkActiveRoute("/campaigns") ? "active-route" : ""}>
+            <NavLink tag={Link} to={"/campaigns"}>
+            <i className="bi bi-cart"></i> {appMessages.get("campaigns")}
             </NavLink>
           </NavItem>
           <NavItem>

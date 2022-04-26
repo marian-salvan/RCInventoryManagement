@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
 import { NewReportStateModel } from '../../models/forms.models';
-import { fireStoreDatabase, showNewReportModal, setNewReportModal, setNewReportName } from '../../reducers/app.reducer';
+import { showNewReportModal, setNewReportModal, setNewReportName } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import './CreateReportModal.css';
 
@@ -10,7 +10,6 @@ interface CreateReportModalProps {}
 
 const CreateReportModal: FC<CreateReportModalProps> = () => {
   const dispatch = useAppDispatch();
-  const db = useAppSelector(fireStoreDatabase);
   const showModal = useAppSelector(showNewReportModal);
 
   const [newReportState, setdNewReportState] = useState<NewReportStateModel>({
@@ -70,7 +69,7 @@ const CreateReportModal: FC<CreateReportModalProps> = () => {
                 type="text"
                 name="name"
                 id="name"
-                placeholder="Nume inventar"
+                placeholder={appLabels.get("inventoryName")}
                 invalid={ newReportState.validName !== null && !newReportState.validName }
               />
               <FormFeedback>
