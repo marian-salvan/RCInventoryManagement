@@ -1,11 +1,12 @@
 import React, { FC, useEffect } from 'react';
-import { Alert, Button, Card, CardBody, CardSubtitle, CardText, CardTitle, List, Table } from 'reactstrap';
+import { Button, Card, CardBody, CardTitle, Table } from 'reactstrap';
 import CreateCampaignModal from '../../components/CreateCampaignModal/CreateCampaignModal';
 import { appLabels } from '../../constants/messages.constants';
 import { convertTimeStampToDateString } from '../../helpers/date.helper';
-import { campaigns, fireStoreDatabase, loggedInUserMetadata, newCampaign, reloadCampaignTable, setNewCampaign, setNewCampaignModal, setReloadCampaignTable } from '../../reducers/app.reducer';
+import { campaigns, fireStoreDatabase, loggedInUserMetadata, 
+         newCampaign, setNewCampaign, setNewCampaignModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { createCampaignAsync, getAllCampaignsForOrgAsync } from '../../thunks/campaigns.thunk';
+import { createCampaignAsync } from '../../thunks/campaigns.thunk';
 import './Campaigns.css';
 
 interface CampaignsProps {}
@@ -16,34 +17,17 @@ const Campaigns: FC<CampaignsProps> = () => {
   const newCampaignModel = useAppSelector(newCampaign);
   const userMetadata = useAppSelector(loggedInUserMetadata);
   const orgCampaigns = useAppSelector(campaigns);
-  const reload = useAppSelector(reloadCampaignTable);
-
-  useEffect(() => {
-    if (userMetadata) {
-      const orgId = userMetadata.orgId;
-      dispatch(getAllCampaignsForOrgAsync({db, orgId}));   
-    }
-  }, [])
 
   useEffect(() => {
     if (newCampaignModel) {
       const campaign = newCampaignModel;
-      dispatch(createCampaignAsync({db, campaign}))
+      const orgId = userMetadata?.orgId as string;
+      
+      dispatch(createCampaignAsync({db, orgId, campaign}));
       dispatch(setNewCampaign(null));
     }
 
   }, [newCampaignModel])
-  
-
-  useEffect(() => {
-    if (reload && userMetadata) {
-      const orgId = userMetadata.orgId;
-
-      dispatch(setReloadCampaignTable());
-      dispatch(getAllCampaignsForOrgAsync({db, orgId}));
-    }
-  }, [reload]);
-
 
   const createCampaign = () => {
     dispatch(setNewCampaignModal());

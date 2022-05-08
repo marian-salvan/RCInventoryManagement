@@ -4,9 +4,6 @@
     margin-top: 30px;
 }
 
-.products-table {
-}
-
 .card-title {
     display: flex;
 }
@@ -15,9 +12,6 @@
     margin-left: auto;
     display: flex;
     gap: 10px;
-}
-
-.button-container .add-button {
 }
 
 .bi.bi-x-circle {

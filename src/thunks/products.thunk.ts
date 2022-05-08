@@ -9,10 +9,12 @@ const reportsCollection = "inventory-reports";
 
 const getAllProductsAsync = createAsyncThunk(
     'app/getAllProductsAsync',
-    async (db: Firestore | null) => {
+    async ({db, orgId}: {db: Firestore | null, orgId: string}) => {
         const productsRef = collection(db as Firestore, productsCollection)
 
-        return await getDocs(query(productsRef, orderBy("name", "asc")));
+        return await getDocs(query(productsRef, 
+            where("orgId", "==", orgId),
+            orderBy("name", "asc")));
     }
 );
 
@@ -22,28 +24,32 @@ const createProductAsync = createAsyncThunk(
         return await runTransaction(db as Firestore, async (transaction) => {
             const newDocRef = doc(collection(db as Firestore, productsCollection));
             const productsRef = collection(db as Firestore, productsCollection);
-            const productsQuerrySnapshot = await getDocs(query(productsRef, where("name", "==", product.name)));
+            const productsQuerrySnapshot = await getDocs(query(productsRef,
+                where("orgId", "==", product.orgId), 
+                where("name", "==", product.name)));
         
             if (productsQuerrySnapshot.docs.length > 0) {
                 return Promise.reject(appErrors.get("existingProductName"));
             }
 
-            const reportsRef = collection(db as Firestore, reportsCollection)
-            const reportsQuerySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
-
-            if (reportsQuerySnapshot.docs.length === 1) {
-               
-                let docToBeUpdated = reportsQuerySnapshot.docs[0].data() as InventoryReport;
-                docToBeUpdated.inventory.push({
-                   ...product,
-                   quantity: 0,
-                   totalPrice: 0
-                });
-
-                transaction.update(reportsQuerySnapshot.docs[0].ref, {inventory: docToBeUpdated.inventory});
-            }
-
             transaction.set(newDocRef, product);           
+        });
+    }
+)
+
+const addOrgIdToAllProductsAsync = createAsyncThunk(
+    'app/addOrgIdToAllProducts',
+    async ({db, orgId}: {db: Firestore | null, orgId: string}) => {
+        return await runTransaction(db as Firestore, async (transaction) => {
+            const productsRef = collection(db as Firestore, productsCollection)
+            const querrySnapshot = await getDocs(query(productsRef));
+
+            querrySnapshot.docs.forEach(doc => {
+                let product = doc.data() as ProductModel;
+                product.orgId = orgId;
+
+                transaction.update(doc.ref, { ...product });
+            });
         });
     }
 )
@@ -53,14 +59,18 @@ const editProductAsync = createAsyncThunk(
     async ({db, product}: {db: Firestore | null, product: ProductModel}) => {
         return await runTransaction(db as Firestore, async (transaction) => {
             const productsRef = collection(db as Firestore, productsCollection)
-            const querrySnapshot = await getDocs(query(productsRef, where("uid", "==", product.uid)));
+            const querrySnapshot = await getDocs(query(productsRef, 
+                where("orgId", "==", product.orgId), 
+                where("uid", "==", product.uid)));
 
-            if (querrySnapshot.docs.length != 1) {
+            if (querrySnapshot.docs.length !== 1) {
                 return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             const reportsRef = collection(db as Firestore, reportsCollection)
-            const reportsQuerySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+            const reportsQuerySnapshot = await getDocs(query(reportsRef,
+                where("orgId", "==", product.orgId), 
+                where("active", "==", true)));
 
             if (reportsQuerySnapshot.docs.length === 1) {               
                 let docToBeUpdated = reportsQuerySnapshot.docs[0].data() as InventoryReport;
@@ -90,17 +100,21 @@ const editProductAsync = createAsyncThunk(
 
 const deleteProductAsync = createAsyncThunk(
     'app/deleteProductAsync',
-    async ({db, uid}: {db: Firestore | null, uid: string}) => {
+    async ({db, uid, orgId}: {db: Firestore | null, uid: string, orgId: string}) => {
         return await runTransaction(db as Firestore, async (transaction) => {
             const productsRef = collection(db as Firestore, productsCollection)
-            const querrySnapshot = await getDocs(query(productsRef, where("uid", "==", uid)));
+            const querrySnapshot = await getDocs(query(productsRef, 
+                where("orgId", "==", orgId), 
+                where("uid", "==", uid)));
 
-            if (querrySnapshot.docs.length != 1) {
+            if (querrySnapshot.docs.length !== 1) {
                 return Promise.reject(appErrors.get("genericErrorMessage") as string);
             }
 
             const reportsRef = collection(db as Firestore, reportsCollection)
-            const reportsQuerySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+            const reportsQuerySnapshot = await getDocs(query(reportsRef,
+                where("orgId", "==", orgId),  
+                where("active", "==", true)));
 
             if (reportsQuerySnapshot.docs.length === 1) {
                
@@ -121,5 +135,11 @@ const deleteProductAsync = createAsyncThunk(
     }
 )
 
-export { getAllProductsAsync, createProductAsync, editProductAsync, deleteProductAsync};
+export { 
+    getAllProductsAsync, 
+    createProductAsync,
+    editProductAsync, 
+    deleteProductAsync,
+    addOrgIdToAllProductsAsync
+};
 

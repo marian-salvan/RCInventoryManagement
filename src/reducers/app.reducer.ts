@@ -2,21 +2,21 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
-import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel } from '../models/modal.models';
+import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
-import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/reports.models';
+import { InventoryReport, NewReportModel, PacakagesReport, ReportProductModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
-import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync} from '../thunks/products.thunk';
+import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync, addOrgIdToAllProductsAsync} from '../thunks/products.thunk';
 import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync,
          getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync,
-         getInventoryReportsByUidAsync, removeQtyFromProductAsync } from '../thunks/inventory-reports.thunk';
+         getInventoryReportsByUidAsync, removeQtyFromProductAsync, updateInventoryAsync } from '../thunks/inventory-reports.thunk';
 import { getLoggedInUserMetaDataAsync, } from '../thunks/users.thunk';
 import { addPackagesAsync, getActivePackagesReportsAsync, getPackagesReportsByUidAsync, removePackagesAsync } from '../thunks/packages-reports.thunk';
 import { initialState } from './app.state';
 import { appErrors } from '../constants/messages.constants';
-import { createCampaignAsync, getAllCampaignsForOrgAsync } from '../thunks/campaigns.thunk';
+import { changeActiveCampaignAsync, createCampaignAsync, getAllCampaignsForOrgAsync } from '../thunks/campaigns.thunk';
 import { CampaignModel } from '../models/campaigns.models';
 
 export const appSlice = createSlice({
@@ -75,8 +75,8 @@ export const appSlice = createSlice({
     setNewReportModal: (state) => {
       state.showNewReportModal = !state.showNewReportModal;
     },
-    setNewReportName: (state, action: PayloadAction<string | null>) => {
-      state.newReportName = action.payload;
+    setNewReportModel: (state, action: PayloadAction<NewReportModel | null>) => {
+      state.newReportModel = action.payload;
     },
     setPackagesModalModel: (state, action: PayloadAction<AddRemoveModalModel | null>) => {
       state.packagesModalModel = action.payload;
@@ -98,7 +98,13 @@ export const appSlice = createSlice({
     },
     setReloadCampaignTable: (state) => {
       state.reloadCampaignTable = !state.reloadCampaignTable;
-    },  
+    }, 
+    setActiveCampaign: (state, action: PayloadAction<CampaignModel | null>) => {
+      state.activeCampaign = action.payload;
+    },
+    setModifyInvProductsModalModel (state, action: PayloadAction<ModifyInvProductsModalModel>) {
+      state.modifyInvProductsModalModel = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -310,6 +316,19 @@ export const appSlice = createSlice({
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
+      .addCase(updateInventoryAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(updateInventoryAsync.fulfilled, (state, action) => {
+        state.reloadReportsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(updateInventoryAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
 
       //packages-reports  
       .addCase(getActivePackagesReportsAsync.pending, (state) => {
@@ -386,7 +405,13 @@ export const appSlice = createSlice({
           const campaigns: CampaignModel[] = [];
   
           action.payload.docs.forEach(doc => {
-            campaigns.push(doc.data() as CampaignModel);
+            const canspaign = doc.data() as CampaignModel
+
+            if (canspaign.active) {
+              state.activeCampaign = canspaign;
+            }
+            
+            campaigns.push(canspaign);
           });
 
           state.campaigns = campaigns;
@@ -413,16 +438,45 @@ export const appSlice = createSlice({
         state.showLoader = false;
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
-      })     
+      })
+      
+      .addCase(changeActiveCampaignAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(changeActiveCampaignAsync.fulfilled, (state, action) => {
+        state.reloadCampaignTable = true;
+        state.showLoader = false;
+      })
+      .addCase(changeActiveCampaignAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      
+      //TO BE REMOVED 
+      .addCase(addOrgIdToAllProductsAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(addOrgIdToAllProductsAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(addOrgIdToAllProductsAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })  
     },
 });
 
 export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
   setAddEditProductModal, setConfirmationModal, setConfirmationModalModel, setActionAccepted,
-  setProductToBeAdded, setProductToBeEdited, setReloadProductsTable, setReloadReportsTable, setNewReportName,
+  setProductToBeAdded, setProductToBeEdited, setReloadProductsTable, setReloadReportsTable, setNewReportModel,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
   setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter, setNewCampaignModal,
-  setNewCampaign, setReloadCampaignTable } = appSlice.actions;
+  setNewCampaign, setReloadCampaignTable, setActiveCampaign, setModifyInvProductsModalModel } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -446,7 +500,7 @@ export const quantityModalModel = (state: RootState) => state.appReducer.quantit
 export const inventoryEntryToAdd = (state: RootState) => state.appReducer.inventoryEntryToAdd;
 export const inventoryEntryToSubstract = (state: RootState) => state.appReducer.inventoryEntryToSubstract;
 export const showNewReportModal = (state: RootState) => state.appReducer.showNewReportModal;
-export const newReportName = (state: RootState) => state.appReducer.newReportName;
+export const newReportModel = (state: RootState) => state.appReducer.newReportModel;
 export const packagesModalModel = (state: RootState) => state.appReducer.packagesModalModel;
 export const gridSearchText = (state: RootState) => state.appReducer.gridSearchText;
 export const inactiveInventoryReports = (state: RootState) => state.appReducer.inactiveInventoryReports;
@@ -458,5 +512,7 @@ export const campaigns = (state: RootState) => state.appReducer.campaigns;
 export const showNewCampaignModal = (state: RootState) => state.appReducer.showNewCampaignModal;
 export const newCampaign = (state: RootState) => state.appReducer.newCampaign;
 export const reloadCampaignTable = (state: RootState) => state.appReducer.reloadCampaignTable;
+export const activeCampaign = (state: RootState) => state.appReducer.activeCampaign;
+export const modifyInvProductsModalModel = (state: RootState) => state.appReducer.modifyInvProductsModalModel;
 
 export default appSlice.reducer;

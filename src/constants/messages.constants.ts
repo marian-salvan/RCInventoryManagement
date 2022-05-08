@@ -10,7 +10,7 @@ export const appMessages = new Map<string, string>([
   ["confirmationModalDefaultTitle", "Confirmă operația"],
   ["confirmationModalDefaultMessage", "Doriți să efectuați această operație?"],
   ["deleteProductModalTitle", "Confirmă ștergerea produsului"], 
-  ["deleteProductModalMessage", "Doriți să ștergeți acest acest produs? El va fi șters și din inventarul curent."], 
+  ["deleteProductModalMessage", "Doriți să ștergeți acest acest produs? El va fi șters din toate inventarele active din toate campaniile."], 
   ["closeCurrentInventoryTitle", "Închidere inventar"], 
   ["closeCurrentInventoryMessage", `Doriți să închideți inventarul curent? Nu veți
                                     mai putea face modificări asupra lui, dar veți putea vedea raportul rezultat în pagina de rapoarte.`], 
@@ -31,10 +31,12 @@ export const appMessages = new Map<string, string>([
   ["noActiveInventory", "Nu există un inventar activ. Contactați administratorul pentru crearea lui."],
   ["noActiveInventoryAdminPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Doriți să creați unul?"],
   ["noActiveInventoryPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui."],
-  ["editWarning", "Datele acestui produs vor fi schimbate și în inventarul activ. Sigur doriți să efectuați această operație?"],
+  ["editWarning", "Datele acestui produs vor fi schimbate și în toate inventarele active din toate campaniile. Sigur doriți să efectuați această operație?"],
   ["campaigns", "Campanii"],
   ["createNewCampaigTitle", "Creați campanie"],
-  
+  ["modifyInventoryProductsTitle", "Modificați produsele din inventar"],
+  ["modifyInventoryProductsMessage", `Atenție! Produsele pe care le veți scoate din inventar vor avea stocul șters! 
+                                      Le veți putea adăuga din nou dar stocul lor va fi reinițializat cu 0.`],
 ])
 
 export const appErrors = new Map<string, string>([
@@ -99,10 +101,14 @@ export const appLabels = new Map<string, string>([
   ["reportsGridSeeReport", "Vezi raportul"],
   ["edit", "Editează"],
   ["addToInventory", "Adaugă produsul la inventarul activ"],
-  ["campaignName", "Nume campanie"]
+  ["campaignName", "Nume campanie"],
+  ["selectedCampaign", "Campania selectată"],
+  ["addProductsToInventory", "Adaugă produse la noul inventar"],
+  ["productOption", "Produse de adăugat"],
+  ["modifyProductList", "Modifică lista de produse"]
 ]);
 
-export const appValidations  = new Map<string, string>([
+export const appValidations = new Map<string, string>([
   ["mandatoryName", "Numele este obligatoriu"],
   ["positivePrice", "Prețul trebuie să fie mai mare decât 0"],
   ["positivePackageNumber", "Numărul de pachete introdus trebuie să fie mai mare sau egal cu 0"],
@@ -110,3 +116,11 @@ export const appValidations  = new Map<string, string>([
   ["positiveInventoryQty", "Cantitatea introdusă trebuie să fie mai mare decât 0"],
   ["incorrectEmail", "Emailul introdus nu este corect"]
 ]); 
+
+export const productSelectionOptions = new Map<string, string> (
+  [
+    ["all", "Toate produsele"],
+    ["none", "Adaugă produsele mai târziu"],
+    ["selectProducts", "Selectează produsele individuale"]
+  ]
+)

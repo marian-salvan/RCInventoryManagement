@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { appLabels, appValidations } from '../../constants/messages.constants';
 import { EditPackagesStateModel } from '../../models/forms.models';
 import { ReportPackageModel } from '../../models/reports.models';
-import { fireStoreDatabase, packagesModalModel, setPackagesModalModel } from '../../reducers/app.reducer';
+import { activeCampaign, fireStoreDatabase, loggedInUserMetadata, packagesModalModel, setPackagesModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { addPackagesAsync, removePackagesAsync } from '../../thunks/packages-reports.thunk';
 
@@ -14,6 +14,8 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
   const editPackageModel = useSelector(packagesModalModel);
+  const userMetadata = useAppSelector(loggedInUserMetadata);
+  const activeOrgCampaign = useAppSelector(activeCampaign);
 
   const [showModal, setShowModal] = useState(false);
   const [editPackagesStateModel, setEditPackagesStateModel] = useState<EditPackagesStateModel>({
@@ -72,13 +74,16 @@ const EditPackagesModal: FC<EditPackagesModalProps> = () => {
   }
 
   const updateQuantity = () => {
+    const orgId = userMetadata?.orgId as string;
+    const campaignId = activeOrgCampaign?.campaignId as string;
+
     const packageReport: ReportPackageModel = {
       quantity: editPackagesStateModel.quantity,
       totalPackages: editPackagesStateModel.totalPackages
     };
 
-    editPackageModel?.addQty ? dispatch(addPackagesAsync({db, packageReport}))
-                             : dispatch(removePackagesAsync({db, packageReport}));
+    editPackageModel?.addQty ? dispatch(addPackagesAsync({db, packageReport, orgId, campaignId}))
+                             : dispatch(removePackagesAsync({db, packageReport, orgId, campaignId}));
 
     toggle();
   }

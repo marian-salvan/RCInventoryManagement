@@ -1,6 +1,7 @@
 import { InventoryReport, PacakagesReport } from "../models/reports.models";
 
 const dowloadReport = (tableId: string, 
+                       campaignName: string,
                        inventoryReport: InventoryReport | null, 
                        packagesReport: PacakagesReport | null,
                        category: string | null) => {
@@ -26,8 +27,8 @@ const dowloadReport = (tableId: string,
     ]);
     XLSX.utils.book_append_sheet(workbook, sheet2, "Sheet2");
 
-    const workbookTitle = category ? `${inventoryReport?.name}_${category}.xlsx` :
-                                     `${inventoryReport?.name}.xlsx`
+    const workbookTitle = category ? `${campaignName}_${inventoryReport?.name}_${category}.xlsx` :
+                                     `${campaignName}_${inventoryReport?.name}.xlsx`
 
     XLSX.writeFile(workbook, workbookTitle);
 }

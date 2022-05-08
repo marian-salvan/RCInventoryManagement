@@ -6,12 +6,11 @@ import GridSearch from '../../components/GridSearch/GridSearch';
 import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { convertTimeStampToDateString, getCurrentDateString } from '../../helpers/date.helper';
 import { ReportProductModel } from '../../models/reports.models';
-import { actionAccepted, activeInventoryReport, activePackagesReport, allProducts, fireStoreDatabase, 
+import { actionAccepted, activeCampaign, activeInventoryReport, activePackagesReport, fireStoreDatabase, 
   gridCategoryFilter, 
-  gridSearchText, loggedInUserMetadata, newReportName, reloadReportsTable, setActionAccepted,
+  gridSearchText, loggedInUserMetadata, newReportModel, reloadReportsTable, setActionAccepted,
   setConfirmationModal, setConfirmationModalModel, setGridCategoryFilter, setGridSearchText, setInventoryEntryToAdd, 
-  setInventoryEntryToSubstract, setNewReportModal, setNewReportName, setQuantityModalModel,
-  setReloadReportsTable } from '../../reducers/app.reducer';
+  setInventoryEntryToSubstract, setModifyInvProductsModalModel, setNewReportModal, setNewReportModel, setQuantityModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getAllProductsAsync } from '../../thunks/products.thunk';
 import { closeCurrentReportAsync, createActiveReportAsync, getActiveInventoryReportsAsync } from '../../thunks/inventory-reports.thunk';
@@ -24,7 +23,8 @@ import { dowloadReport } from '../../helpers/reports.helper';
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
-import { app } from 'firebase-admin';
+import EditProductListModal from '../../components/EditProductListModal/EditProductListModal';
+import { ModifyInvProductsModalModel } from '../../models/modal.models';
 
 interface InventoryProps {}
 
@@ -34,30 +34,38 @@ const Inventory: FC<InventoryProps> = () => {
   const reload = useAppSelector(reloadReportsTable);
   const currentInventoryReport = useAppSelector(activeInventoryReport);
   const packagesReport = useAppSelector(activePackagesReport);
-  const availableProducts = useAppSelector(allProducts);
   const inventoryConfirmation = useAppSelector(actionAccepted);
-  const reportName = useAppSelector(newReportName);
+  const newReport = useAppSelector(newReportModel);
   const searchText = useAppSelector(gridSearchText);
   const categoryFilter = useAppSelector(gridCategoryFilter);
   const userMetadata = useAppSelector(loggedInUserMetadata);
+  const activeOrgCampaign = useAppSelector(activeCampaign);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
   const [orderByColumn, setOrderByColumn] = useState<string>(GRID_SORT_ENUM.NAME);
 
   useEffect(() => {
-    dispatch(getActiveInventoryReportsAsync(db));
-    dispatch(getAllProductsAsync(db));
+    if (userMetadata && activeOrgCampaign) {
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
+  
+      dispatch(getActiveInventoryReportsAsync({db, orgId, campaignId}));
+      dispatch(getAllProductsAsync({db, orgId}));
+    }
 
     return () => {
       dispatch(setGridSearchText(null));
       dispatch(setGridCategoryFilter(null));
     }
-  }, []);
+  }, [userMetadata, activeOrgCampaign]);
 
   useEffect(() => {
     if (reload) {
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
+
       dispatch(setReloadReportsTable());
-      dispatch(getActiveInventoryReportsAsync(db));
+      dispatch(getActiveInventoryReportsAsync({db, orgId, campaignId}));
     }
   }, [reload]);
 
@@ -79,18 +87,23 @@ const Inventory: FC<InventoryProps> = () => {
   
   useEffect(() => {
     if (inventoryConfirmation) {
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
+
       dispatch(setActionAccepted());
-      dispatch(closeCurrentReportAsync(db));
+      dispatch(closeCurrentReportAsync({db, orgId, campaignId}));
     }
   }, [inventoryConfirmation]);
   
   useEffect(() => {
-    if (reportName) {
+    if (newReport) {
       let inventory: ReportProductModel[] = [];
       const { v4: uuidv4 } = require('uuid');
       const uid =  uuidv4();
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
 
-      availableProducts?.map(p => {
+      newReport.selectedProuducts?.map(p => {
         let reportProductModel: ReportProductModel = {
           uid: p.uid,
           name: p.name,
@@ -98,7 +111,8 @@ const Inventory: FC<InventoryProps> = () => {
           referencePrice: p.referencePrice,
           type: p.type,
           totalPrice: 0,
-          quantity: 0
+          quantity: 0,
+          orgId: p.orgId
         }
 
         inventory.push(reportProductModel);
@@ -106,18 +120,22 @@ const Inventory: FC<InventoryProps> = () => {
 
       defaultInventoryReportModel.uid = uid;
       defaultInventoryReportModel.inventory = inventory;
-      defaultInventoryReportModel.name = reportName;
-
+      defaultInventoryReportModel.name = newReport.reportName;
+      defaultInventoryReportModel.orgId = userMetadata?.orgId as string;
+      defaultInventoryReportModel.campaignId = activeOrgCampaign?.campaignId as string;
+      
       defaulPackagesReportModel.uid = uid;
-      defaulPackagesReportModel.name = reportName;
+      defaulPackagesReportModel.name = newReport.reportName;
+      defaulPackagesReportModel.orgId = userMetadata?.orgId as string;
+      defaulPackagesReportModel.campaignId = activeOrgCampaign?.campaignId as string;
 
       let inventoryReport = defaultInventoryReportModel;
       let packagesReport = defaulPackagesReportModel;
 
-      dispatch(createActiveReportAsync({db, inventoryReport, packagesReport}));
-      dispatch(setNewReportName(null));      
+      dispatch(createActiveReportAsync({db, inventoryReport, packagesReport, orgId, campaignId}));
+      dispatch(setNewReportModel(null));      
     }
-  }, [reportName])
+  }, [newReport])
 
   const openAddQtyModal = (reportProduct: ReportProductModel) => {
     dispatch(setQuantityModalModel({
@@ -152,12 +170,20 @@ const Inventory: FC<InventoryProps> = () => {
   }
 
   const downloadReport = () => {
-    dowloadReport("inventory-table", currentInventoryReport, packagesReport, categoryFilter);
+    dowloadReport("inventory-table", activeOrgCampaign?.name as string, currentInventoryReport, packagesReport, categoryFilter);
   }
 
   const showCreateNewReportModal = () => {
     dispatch(setNewReportModal());
   }
+
+  const modifyProductList = () => {
+    const modalModel: ModifyInvProductsModalModel = {
+      showModal: true,
+      inventoryProducts: currentInventoryReport?.inventory as ReportProductModel[]
+    }
+
+    dispatch(setModifyInvProductsModalModel(modalModel));  }
 
   const sortAfterColumn = (sortColumn: string) => {
     setOrderByColumn(sortColumn);
@@ -182,10 +208,14 @@ const Inventory: FC<InventoryProps> = () => {
                 </div>
               }
             </CardTitle>
-            <CardSubtitle><h6>{appLabels.get("period")}: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6></CardSubtitle>
+            <CardSubtitle>
+              <h6>{appLabels.get("period")}: {convertTimeStampToDateString(currentInventoryReport?.fromDate.seconds as number)} - {getCurrentDateString()}</h6>
+              </CardSubtitle>
             <div className="inventory-table-header">
               <GridSearch />
               <GridCategoryFilter />
+              { userHasAccess() && 
+              <Button onClick={() => modifyProductList()} className="modify-product-list" outline color="danger">{appLabels.get("modifyProductList")}</Button> }
             </div>
             <div className="table-container">
               <Table hover className="inventory-table" id="inventory-table">
@@ -208,8 +238,8 @@ const Inventory: FC<InventoryProps> = () => {
                     <th>{appLabels.get("inventoryGridQty")}</th>
                     <th>{appLabels.get("inventoryGridUnit")}</th>
                     { userHasAccess() && <th>{appLabels.get("inventoryGridTotalPrice")}</th> }
-                    <th>{appLabels.get("inventoryGridDeleteQty")}</th>
-                    <th>{appLabels.get("inventoryGridAddQty")}</th>
+                    <th className="table-centered-cell">{appLabels.get("inventoryGridDeleteQty")}</th>
+                    <th className="table-centered-cell">{appLabels.get("inventoryGridAddQty")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -223,8 +253,8 @@ const Inventory: FC<InventoryProps> = () => {
                       <td>{(Math.round(product.quantity * 100) / 100).toFixed(2)}</td>
                       <td>{product.unit}</td>
                       { userHasAccess() && <td>{(Math.round(product.totalPrice * 100) / 100).toFixed(2)}</td> }
-                      <td onClick={() => openRemoveQtyModal(product)}><i className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
-                      <td onClick={() => openAddQtyModal(product)}><i className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
+                      <td className="table-centered-cell"><i onClick={() => openRemoveQtyModal(product)} className="bi bi-dash-circle" title="Șterge cantitate"></i></td>
+                      <td className="table-centered-cell"><i onClick={() => openAddQtyModal(product)} className="bi bi-plus-circle" title="Adaugă cantitate"></i></td>
                     </tr>
                     ))
                   }
@@ -235,6 +265,7 @@ const Inventory: FC<InventoryProps> = () => {
         </Card>
         <QuantityModal/>
         <ConfirmationModal />
+        <EditProductListModal />
       </div>
     );
   }

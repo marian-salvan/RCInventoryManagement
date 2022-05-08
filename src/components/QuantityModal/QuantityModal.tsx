@@ -3,7 +3,7 @@ import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, 
 import { appLabels, appValidations } from '../../constants/messages.constants';
 import { EditQuantityStateModel } from '../../models/forms.models';
 import { ReportProductModel } from '../../models/reports.models';
-import { fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, quantityModalModel, setQuantityModalModel } from '../../reducers/app.reducer';
+import { activeCampaign, fireStoreDatabase, inventoryEntryToAdd, inventoryEntryToSubstract, loggedInUserMetadata, quantityModalModel, setQuantityModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { addQtyFromProductAsync, removeQtyFromProductAsync } from '../../thunks/inventory-reports.thunk';
 import  './QuantityModal.css';
@@ -14,9 +14,10 @@ const QuantityModal: FC<QuantityModalProps> = () => {
   const dispatch = useAppDispatch();
   const db = useAppSelector(fireStoreDatabase);
   const quantityModal = useAppSelector(quantityModalModel);
-
   const reportToAdd = useAppSelector(inventoryEntryToAdd);
   const reportToSubstract = useAppSelector(inventoryEntryToSubstract);
+  const userMetadata = useAppSelector(loggedInUserMetadata);
+  const activeOrgCampaign = useAppSelector(activeCampaign);
 
   const [showModal, setShowModal] = useState(false);
   const [editQuantityModel, setEditQuantityModel] = useState<EditQuantityStateModel>({
@@ -61,16 +62,19 @@ const QuantityModal: FC<QuantityModalProps> = () => {
   }
 
   const updateQuantity = () => {
+    const orgId = userMetadata?.orgId as string;
+    const campaignId = activeOrgCampaign?.campaignId as string;
+
     if (quantityModal?.addQty) {
       const report = { ...reportToAdd } as ReportProductModel;
       report.quantity = editQuantityModel.quantity;
       
-      dispatch(addQtyFromProductAsync({db, report}))
+      dispatch(addQtyFromProductAsync({db, report, orgId, campaignId}))
     } else {
       const report = { ...reportToSubstract} as ReportProductModel;
       report.quantity = editQuantityModel.quantity;
 
-      dispatch(removeQtyFromProductAsync({db, report}))
+      dispatch(removeQtyFromProductAsync({db, report, orgId, campaignId}))
     }
 
     toggle();

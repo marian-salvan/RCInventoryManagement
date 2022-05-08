@@ -11,7 +11,7 @@ import { convertTimeStampToDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 import { ReportProductModel } from '../../models/reports.models';
-import { fireStoreDatabase, gridCategoryFilter, selectedInventoryReport, selectedPackageReport, setGridCategoryFilter} from '../../reducers/app.reducer';
+import { activeCampaign, fireStoreDatabase, gridCategoryFilter, loggedInUserMetadata, selectedInventoryReport, selectedPackageReport, setGridCategoryFilter} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getInventoryReportsByUidAsync } from '../../thunks/inventory-reports.thunk';
 import { getPackagesReportsByUidAsync } from '../../thunks/packages-reports.thunk';
@@ -25,6 +25,8 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   const inventoryReport = useAppSelector(selectedInventoryReport);
   const packagesReport = useAppSelector(selectedPackageReport);
   const categoryFilter = useAppSelector(gridCategoryFilter);
+  const userMetadata = useAppSelector(loggedInUserMetadata);
+  const activeOrgCampaign = useAppSelector(activeCampaign);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
 
@@ -33,9 +35,11 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   useEffect(() => {
     if (reportId) {
       const uid = reportId as string;
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
 
-      dispatch(getInventoryReportsByUidAsync({db, uid}));
-      dispatch(getPackagesReportsByUidAsync({db, uid}));
+      dispatch(getInventoryReportsByUidAsync({db, uid, orgId, campaignId}));
+      dispatch(getPackagesReportsByUidAsync({db, uid, orgId, campaignId}));
     }
 
     return () => {
@@ -55,7 +59,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   }, [inventoryReport, categoryFilter])
   
   const downloadReport = () => {
-    dowloadReport("report-table", inventoryReport, packagesReport, categoryFilter);
+    dowloadReport("report-table", activeOrgCampaign?.name as string, inventoryReport, packagesReport, categoryFilter);
   }
 
   const getAverageQty = (): string => {

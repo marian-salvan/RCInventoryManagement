@@ -7,29 +7,38 @@ const packagesReportsCollection = "packages-reports";
 
 const getActivePackagesReportsAsync = createAsyncThunk(
     'app/getActivePackagesReportAsync',
-    async (db: Firestore | null) => {
+    async ({db, orgId, campaignId}: {db: Firestore | null, orgId: string, campaignId: string}) => {
         const productsRef = collection(db as Firestore, packagesReportsCollection);
 
-        return await getDocs(query(productsRef, where("active", "==", true)));
+        return await getDocs(query(productsRef, 
+            where("active", "==", true),
+            where("orgId", "==", orgId),
+            where("campaignId", "==", campaignId)));
     }
 );
 
 const getPackagesReportsByUidAsync = createAsyncThunk(
     'app/getPackagesReportsByUidAsync',
-    async ({db, uid}: {db: Firestore | null, uid: string}) => {
+    async ({db, uid, orgId, campaignId}: {db: Firestore | null, uid: string, orgId: string, campaignId: string}) => {
         const productsRef = collection(db as Firestore, packagesReportsCollection);
 
-        return await getDocs(query(productsRef, where("uid", "==", uid)));
+        return await getDocs(query(productsRef, 
+            where("uid", "==", uid),
+            where("orgId", "==", orgId),
+            where("campaignId", "==", campaignId)));
     }
 );
 
-
 const addPackagesAsync = createAsyncThunk(
     'app/addPackagesAsync',
-    async ({db, packageReport}: {db: Firestore | null, packageReport: ReportPackageModel}) => {
+    async ({db, packageReport, orgId, campaignId}: 
+        {db: Firestore | null, packageReport: ReportPackageModel, orgId: string, campaignId: string}) => {
         return await runTransaction(db as Firestore, async (transaction) => {
             const reportsRef = collection(db as Firestore, packagesReportsCollection)
-            const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+            const querrySnapshot = await getDocs(query(reportsRef, 
+                where("active", "==", true),
+                where("orgId", "==", orgId),
+                where("campaignId", "==", campaignId)));
 
             if (querrySnapshot.docs.length !== 1) {
                 return Promise.reject(appErrors.get("genericErrorMessage") as string);
@@ -47,10 +56,14 @@ const addPackagesAsync = createAsyncThunk(
 
 const removePackagesAsync = createAsyncThunk(
     'app/removePackagesAsync',
-    async ({db, packageReport}: {db: Firestore | null, packageReport: ReportPackageModel}) => {
+    async ({db, packageReport, orgId, campaignId}: 
+        {db: Firestore | null, packageReport: ReportPackageModel,  orgId: string, campaignId: string}) => {
         return await runTransaction(db as Firestore, async (transaction) => {
             const reportsRef = collection(db as Firestore, packagesReportsCollection)
-            const querrySnapshot = await getDocs(query(reportsRef, where("active", "==", true)));
+            const querrySnapshot = await getDocs(query(reportsRef, 
+                where("active", "==", true),
+                where("orgId", "==", orgId),
+                where("campaignId", "==", campaignId)));
 
             if (querrySnapshot.docs.length !== 1) {
                 return Promise.reject(appErrors.get("genericErrorMessage") as string);

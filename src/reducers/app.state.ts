@@ -3,9 +3,9 @@ import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
 import { appErrors, appMessages } from '../constants/messages.constants';
 import { CampaignModel } from '../models/campaigns.models';
-import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel } from '../models/modal.models';
+import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
-import { InventoryReport, PacakagesReport, ReportProductModel } from '../models/reports.models';
+import { InventoryReport, NewReportModel, PacakagesReport, ReportProductModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
 
 export interface AppState {
@@ -31,7 +31,7 @@ export interface AppState {
     inventoryEntryToAdd: ReportProductModel | null;
     inventoryEntryToSubstract: ReportProductModel | null;
     showNewReportModal: boolean;
-    newReportName: string | null;
+    newReportModel: NewReportModel | null;
     packagesModalModel: AddRemoveModalModel | null;
     gridSearchText: string | null;
     inactiveInventoryReports: InventoryReport[] | null;
@@ -43,6 +43,8 @@ export interface AppState {
     showNewCampaignModal: boolean;
     newCampaign: CampaignModel | null;
     reloadCampaignTable: boolean;
+    activeCampaign: CampaignModel | null;
+    modifyInvProductsModalModel: ModifyInvProductsModalModel;
 }
   
 export const initialState: AppState = {
@@ -71,7 +73,7 @@ export const initialState: AppState = {
     inventoryEntryToAdd: null,
     inventoryEntryToSubstract: null,
     showNewReportModal: false,
-    newReportName: "",
+    newReportModel: null,
     packagesModalModel: null,
     gridSearchText: null,
     activePackagesReport: null,
@@ -86,5 +88,10 @@ export const initialState: AppState = {
     campaigns: null,
     showNewCampaignModal: false,
     newCampaign: null,
-    reloadCampaignTable: false
+    reloadCampaignTable: false,
+    activeCampaign: null,
+    modifyInvProductsModalModel: {
+        showModal: false,
+        inventoryProducts: []
+    }
 };

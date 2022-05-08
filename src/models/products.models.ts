@@ -4,4 +4,5 @@ export interface ProductModel {
     referencePrice: number;
     type: string;
     unit: string;
+    orgId: string;
 }

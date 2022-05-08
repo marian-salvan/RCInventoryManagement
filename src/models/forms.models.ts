@@ -12,6 +12,7 @@ export interface EditQuantityStateModel {
 
 export interface NewReportStateModel {
     name: string;
+    productOption: string;
     validName: boolean | null;
 }
 

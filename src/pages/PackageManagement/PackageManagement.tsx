@@ -5,7 +5,7 @@ import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationMo
 import EditPackagesModal from '../../components/EditPackagesModal/EditPackagesModal';
 import { appLabels, appMessages } from '../../constants/messages.constants';
 import { ROLES } from '../../constants/roles.enums';
-import { activePackagesReport, fireStoreDatabase, loggedInUserMetadata,
+import { activeCampaign, activePackagesReport, fireStoreDatabase, loggedInUserMetadata,
   reloadReportsTable, setPackagesModalModel, setReloadReportsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { getActivePackagesReportsAsync } from '../../thunks/packages-reports.thunk';
@@ -20,15 +20,24 @@ const PackageManagement: FC<PackageManagementProps> = () => {
   const reload = useAppSelector(reloadReportsTable);
   const navigate = useNavigate();
   const userMetadata = useAppSelector(loggedInUserMetadata);
+  const activeOrgCampaign = useAppSelector(activeCampaign);
 
   useEffect(() => {
-    dispatch(getActivePackagesReportsAsync(db));
-  }, []);
+    if (userMetadata && activeOrgCampaign) {
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
+
+      dispatch(getActivePackagesReportsAsync({db, orgId, campaignId}));
+    }
+  }, [userMetadata, activeOrgCampaign]);
 
   useEffect(() => {
     if (reload) {
+      const orgId = userMetadata?.orgId as string;
+      const campaignId = activeOrgCampaign?.campaignId as string;
+
       dispatch(setReloadReportsTable());
-      dispatch(getActivePackagesReportsAsync(db));
+      dispatch(getActivePackagesReportsAsync({db, orgId, campaignId}));
     }
 
   }, [reload]);

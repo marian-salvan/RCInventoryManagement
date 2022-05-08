@@ -7,6 +7,8 @@ export interface ReportBaseModel {
   active: boolean;
   fromDate: Timestamp;
   toDate?: Timestamp | null;
+  orgId: string;
+  campaignId: string;
 }
 
 export interface ReportPackageModel {
@@ -25,4 +27,9 @@ export interface InventoryReport extends ReportBaseModel {
 
 export interface PacakagesReport extends ReportBaseModel {
   packages: ReportPackageModel;
+}
+
+export interface NewReportModel {
+  reportName: string;
+  selectedProuducts: ProductModel[];
 }
