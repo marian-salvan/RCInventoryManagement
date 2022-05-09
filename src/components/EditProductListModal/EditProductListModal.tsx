@@ -9,7 +9,6 @@ import { SelectOption } from '../../models/select.model';
 import { activeCampaign, allProducts, fireStoreDatabase, loggedInUserMetadata, modifyInvProductsModalModel, setModifyInvProductsModalModel } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { updateInventoryAsync } from '../../thunks/inventory-reports.thunk';
-import { getAllProductsAsync } from '../../thunks/products.thunk';
 import './EditProductListModal.css';
 
 interface ModifyProductListModalProps {}
@@ -25,7 +24,7 @@ const ModifyProductListModal: FC<ModifyProductListModalProps> = () => {
   const [multiselectOptions, setMultiselectOptions] = useState<any[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<SelectOption[]>([]);
   const [defaultProducts, setDefaultProducts] = useState<SelectOption[]>([]);
-  
+
   useEffect(() => {
     if (availableProducts) {
       const options = availableProducts.map(p => {
@@ -37,7 +36,6 @@ const ModifyProductListModal: FC<ModifyProductListModalProps> = () => {
     }
   }, [availableProducts])
   
-
   useEffect(() => {  
     if (modalModel.showModal) {
       const options = modalModel.inventoryProducts.map(p => {

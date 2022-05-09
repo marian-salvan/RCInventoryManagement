@@ -36,6 +36,17 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /campaigns/{campaign} {
+    	allow create: if hasRole('admin');
+      allow read, write: if hasRole('admin') || hasRole('inventoryManager');
+      allow delete: if false;
+    }
+    
+    match /organizations/{organization} {
+    	allow read: if hasRole('admin');
+      allow delete, write, create: if false;
+    }
+
     match /users/{user} {
       allow read: if isLoggedIn();
       allow create, delete, write: if false;

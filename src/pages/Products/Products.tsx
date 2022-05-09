@@ -11,7 +11,7 @@ import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, loggedI
    productToBeAdded, reloadProductsTable, setActionAccepted, setAddEditProductModal, setConfirmationModal,
    setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setProductToBeEdited, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { addOrgIdToAllProductsAsync, createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
+import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
 import './Products.css';
 
 interface ProductsProps {}
@@ -100,11 +100,6 @@ const Products: FC<ProductsProps> = () => {
     dispatch(setAddEditProductModal(true));
   }
 
-  const addOrgIds = () => {
-    const orgId = userMetadata?.orgId as string;
-    dispatch(addOrgIdToAllProductsAsync({db, orgId}))
-  }
-
   const userHasAccess = (): boolean => {
     return userMetadata?.role === ROLES.ADMIN;
   } 
@@ -116,7 +111,6 @@ const Products: FC<ProductsProps> = () => {
           <CardTitle className="card-title">
             <h4>{appLabels.get("productList")}</h4>
             <div className="button-container">
-            { userHasAccess() && <Button className="add-button" color="primary" onClick={() => addOrgIds()}>Adauga organizatia</Button> }
             { userHasAccess() && <Button className="add-button" color="primary" onClick={() => showAddModal()}>{appLabels.get("addProduct")}</Button> }
             </div>
           </CardTitle>  

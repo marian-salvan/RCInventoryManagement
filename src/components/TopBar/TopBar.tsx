@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarText, NavbarToggler, UncontrolledDropdown } from 'reactstrap';
+import { Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav, Navbar, NavbarText, UncontrolledDropdown } from 'reactstrap';
 import { appLabels } from '../../constants/messages.constants';
 import { CampaignModel } from '../../models/campaigns.models';
 import { activeCampaign, campaigns, fireStoreDatabase, loggedInUserMetadata, reloadCampaignTable, setReloadCampaignTable } from '../../reducers/app.reducer';

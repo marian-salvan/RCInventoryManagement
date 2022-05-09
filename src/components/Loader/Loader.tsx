@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Spinner } from 'reactstrap';
 import { appMessages } from '../../constants/messages.constants';
 import './Loader.css';

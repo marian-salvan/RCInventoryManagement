@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { ROLES } from '../../constants/roles.enums';
-import { loggedInUserMetadata, loggedUser, setFromLocation,  } from '../../reducers/app.reducer';
+import { loggedInUserMetadata, loggedUser, setFromLocation } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import'./InventoryManagerRoute.css';
 
@@ -15,7 +15,6 @@ const InventoryManagerRoute: FC<InventoryManagerRouteProps> = ({children}) => {
   const userMetadata = useAppSelector(loggedInUserMetadata);
   const location = useLocation();
 
-  debugger;
   dispatch(setFromLocation(location.pathname));
 
   if (!user) {

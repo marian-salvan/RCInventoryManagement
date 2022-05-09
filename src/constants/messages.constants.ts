@@ -37,6 +37,8 @@ export const appMessages = new Map<string, string>([
   ["modifyInventoryProductsTitle", "Modificați produsele din inventar"],
   ["modifyInventoryProductsMessage", `Atenție! Produsele pe care le veți scoate din inventar vor avea stocul șters! 
                                       Le veți putea adăuga din nou dar stocul lor va fi reinițializat cu 0.`],
+  ["addProductWarning", `Produsul nu va fi adăugat automat în niciun inventar activ din nicio campanie. 
+                         Va trebui să-l adăugați manual din inventar dorit.`]
 ])
 
 export const appErrors = new Map<string, string>([
@@ -105,7 +107,13 @@ export const appLabels = new Map<string, string>([
   ["selectedCampaign", "Campania selectată"],
   ["addProductsToInventory", "Adaugă produse la noul inventar"],
   ["productOption", "Produse de adăugat"],
-  ["modifyProductList", "Modifică lista de produse"]
+  ["modifyProductList", "Modifică lista de produse"],
+  ["existingCampaigns", "Campanii existente"],
+  ["createCampaign", "Crează campanie"],
+  ["campaignCreationDate", "Data creării"],
+  ["campaignState", "Stare"],
+  ["campaignActive", "activă"],
+  ["campaignInactive", "inactivă"]
 ]);
 
 export const appValidations = new Map<string, string>([

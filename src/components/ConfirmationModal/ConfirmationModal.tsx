@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { appLabels } from '../../constants/messages.constants';
 import { confirmationModalModel, setActionAccepted, setConfirmationModal, showConfirmationModal } from '../../reducers/app.reducer';

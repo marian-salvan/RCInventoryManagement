@@ -13,7 +13,7 @@ import ErrorModal from './components/ErrorModal/ErrorModal';
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const app: FirebaseApp = initializeApp(firebaseConfigDev);
+  const app: FirebaseApp = initializeApp(firebaseConfigProd);
   const database: Firestore = getFirestore();
   const user = useAppSelector(loggedUser);
   const loader = useAppSelector(showLoader);

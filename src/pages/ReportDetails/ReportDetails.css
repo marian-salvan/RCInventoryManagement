@@ -2,3 +2,9 @@
     display: flex;
     column-gap: 10px;
 }
+
+
+.details-table-container {
+    height: 400px;
+    overflow-y: scroll;
+}

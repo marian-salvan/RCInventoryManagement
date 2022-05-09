@@ -27,13 +27,15 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   const categoryFilter = useAppSelector(gridCategoryFilter);
   const userMetadata = useAppSelector(loggedInUserMetadata);
   const activeOrgCampaign = useAppSelector(activeCampaign);
+  const gridFilter = useAppSelector(gridCategoryFilter);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
+  const [categoryName, setCategory] = useState<string>("");
 
   const { reportId } = useParams();
 
   useEffect(() => {
-    if (reportId) {
+    if (reportId && activeOrgCampaign) {
       const uid = reportId as string;
       const orgId = userMetadata?.orgId as string;
       const campaignId = activeOrgCampaign?.campaignId as string;
@@ -45,7 +47,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     return () => {
       dispatch(setGridCategoryFilter(null));
     }
-  }, [reportId])
+  }, [reportId, activeOrgCampaign])
 
   useEffect(() => {
     if (inventoryReport) {
@@ -57,6 +59,11 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
                                   setDisplayInventory(reports);
     }
   }, [inventoryReport, categoryFilter])
+
+  useEffect(() => {
+    gridFilter ? setCategory(gridFilter) : setCategory(appLabels.get("all") as string);
+  }, [gridFilter])
+  
   
   const downloadReport = () => {
     dowloadReport("report-table", activeOrgCampaign?.name as string, inventoryReport, packagesReport, categoryFilter);
@@ -77,7 +84,9 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
           <CardTitle className="card-title">
             <h4>{appLabels.get("inventory")}: {inventoryReport?.name}</h4>
             <div className="button-container">
-              <Button className="add-button" color="primary" onClick={() => downloadReport()}>{appLabels.get("downloadReport")}</Button>
+              <Button className="add-button" color="primary" 
+                      onClick={() => downloadReport()}>{appLabels.get("downloadReport") + (categoryName !== "" ? ` (${categoryName})` : "") }
+              </Button>
             </div>
           </CardTitle>
           <CardSubtitle>
@@ -89,7 +98,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
           <div className="report-details-table-header">
               <GridCategoryFilter />
             </div>
-          <div className="table-container">
+          <div className="details-table-container">
             <Table hover className="products-table" id="report-table">
               <thead>
                 <tr>

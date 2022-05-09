@@ -30,7 +30,7 @@ const Content = () => {
         <Route path="/inventory" element={<InventoryManagerRoute><Inventory /></InventoryManagerRoute>}/>
         <Route path="/package-management" element={ <InventoryManagerRoute><PackageManagement /></InventoryManagerRoute> } />
         <Route path="/reports" element={ <AdminRoute><Reports /></AdminRoute>} />
-        <Route path="/campaigns" element={ <AdminRoute><Campaigns /></AdminRoute>} />
+        <Route path="/campaigns" element={ <InventoryManagerRoute><Campaigns /></InventoryManagerRoute>} />
         <Route path="/reports/:reportId" element={<AdminRoute><ReportDetails /></AdminRoute>} />
         <Route path="/access-denied" element={<AccessDenied />}></Route>
         <Route path="*" element={<Navigate to="/" />} />

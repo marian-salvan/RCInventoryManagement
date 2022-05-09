@@ -8,7 +8,7 @@ import { InventoryReport, NewReportModel, PacakagesReport, ReportProductModel } 
 import { UserMetadataModel } from '../models/user.model';
 import { RootState } from '../stores/store';
 import { signInUserAsync, signOutUserAsync } from '../thunks/auth.thunk';
-import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync, addOrgIdToAllProductsAsync} from '../thunks/products.thunk';
+import { getAllProductsAsync, createProductAsync, deleteProductAsync, editProductAsync} from '../thunks/products.thunk';
 import { addQtyFromProductAsync, closeCurrentReportAsync, createActiveReportAsync,
          getActiveInventoryReportsAsync, getInactiveInventoryReportsAsync,
          getInventoryReportsByUidAsync, removeQtyFromProductAsync, updateInventoryAsync } from '../thunks/inventory-reports.thunk';
@@ -453,21 +453,6 @@ export const appSlice = createSlice({
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
-      
-      //TO BE REMOVED 
-      .addCase(addOrgIdToAllProductsAsync.pending, (state) => {
-        state.showLoader = true;
-        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
-      })
-      .addCase(addOrgIdToAllProductsAsync.fulfilled, (state, action) => {
-        state.reloadProductsTable = true;
-        state.showLoader = false;
-      })
-      .addCase(addOrgIdToAllProductsAsync.rejected, (state, action) => {
-        state.showLoader = false;
-        state.errorModalModel.showError = true;
-        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
-      })  
     },
 });
 

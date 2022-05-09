@@ -145,7 +145,11 @@ const AddProductModal: FC<AddProductModalProps> = () => {
         <ModalHeader toggle={toggle}>{ getHeaderTitle() }</ModalHeader>
         <ModalBody>
           {
-            !saveEdit && 
+            saveEdit ? 
+            <div>
+              <span className="edit-warning">{appMessages.get("addProductWarning")}</span>
+            </div>
+            :
             <div>
               <span className="edit-warning">{appMessages.get("editWarning")}</span>
             </div>

@@ -37,23 +37,6 @@ const createProductAsync = createAsyncThunk(
     }
 )
 
-const addOrgIdToAllProductsAsync = createAsyncThunk(
-    'app/addOrgIdToAllProducts',
-    async ({db, orgId}: {db: Firestore | null, orgId: string}) => {
-        return await runTransaction(db as Firestore, async (transaction) => {
-            const productsRef = collection(db as Firestore, productsCollection)
-            const querrySnapshot = await getDocs(query(productsRef));
-
-            querrySnapshot.docs.forEach(doc => {
-                let product = doc.data() as ProductModel;
-                product.orgId = orgId;
-
-                transaction.update(doc.ref, { ...product });
-            });
-        });
-    }
-)
-
 const editProductAsync = createAsyncThunk(
     'app/editProductAsync',
     async ({db, product}: {db: Firestore | null, product: ProductModel}) => {
@@ -72,25 +55,27 @@ const editProductAsync = createAsyncThunk(
                 where("orgId", "==", product.orgId), 
                 where("active", "==", true)));
 
-            if (reportsQuerySnapshot.docs.length === 1) {               
-                let docToBeUpdated = reportsQuerySnapshot.docs[0].data() as InventoryReport;
-                const productIndex = docToBeUpdated.inventory.findIndex(p => p.uid === product.uid);
-
-                if ( productIndex === -1 ) {
-                    return Promise.reject(appErrors.get("genericErrorMessage") as string);
-                }
-
-                const newTotalPrice: number = docToBeUpdated.inventory[productIndex].quantity * product?.referencePrice;
-                
-                const updatedProduct: ReportProductModel = { 
-                    ...product, 
-                    quantity: docToBeUpdated.inventory[productIndex].quantity, 
-                    totalPrice: newTotalPrice
-                };
-
-                docToBeUpdated.inventory[productIndex] = updatedProduct;
-                
-                transaction.update(reportsQuerySnapshot.docs[0].ref, {inventory: docToBeUpdated.inventory});
+            if (reportsQuerySnapshot.docs.length > 0) {               
+                reportsQuerySnapshot.docs.forEach(repSnap => {           
+                    let docToBeUpdated = repSnap.data() as InventoryReport;
+                    const productIndex = docToBeUpdated.inventory.findIndex(p => p.uid === product.uid);
+    
+                    if ( productIndex === -1) {
+                        return Promise.reject(appErrors.get("genericErrorMessage") as string);
+                    }
+    
+                    const newTotalPrice: number = docToBeUpdated.inventory[productIndex].quantity * product?.referencePrice;
+                    
+                    const updatedProduct: ReportProductModel = { 
+                        ...product, 
+                        quantity: docToBeUpdated.inventory[productIndex].quantity, 
+                        totalPrice: newTotalPrice
+                    };
+    
+                    docToBeUpdated.inventory[productIndex] = updatedProduct;
+                    
+                    transaction.update(repSnap.ref, {inventory: docToBeUpdated.inventory});
+                });            
             }
 
             transaction.update(querrySnapshot.docs[0].ref, { ...product });
@@ -116,18 +101,19 @@ const deleteProductAsync = createAsyncThunk(
                 where("orgId", "==", orgId),  
                 where("active", "==", true)));
 
-            if (reportsQuerySnapshot.docs.length === 1) {
-               
-                let docToBeUpdated = reportsQuerySnapshot.docs[0].data() as InventoryReport;
-                const productIndex = docToBeUpdated.inventory.findIndex(p => p.uid === uid);
+            if (reportsQuerySnapshot.docs.length > 0) {         
+                reportsQuerySnapshot.docs.forEach(repSnap => {           
+                    let docToBeUpdated = repSnap.data() as InventoryReport;
+                    const productIndex = docToBeUpdated.inventory.findIndex(p => p.uid === uid);
 
-                if (productIndex === -1) {
-                    return Promise.reject(appErrors.get("genericErrorMessage") as string);
-                }
+                    if (productIndex === -1) {
+                        return Promise.reject(appErrors.get("genericErrorMessage") as string);
+                    }
 
-                docToBeUpdated.inventory.splice(productIndex, 1);
+                    docToBeUpdated.inventory.splice(productIndex, 1);
 
-                transaction.update(reportsQuerySnapshot.docs[0].ref, {inventory: docToBeUpdated.inventory});
+                    transaction.update(repSnap.ref, {inventory: docToBeUpdated.inventory});
+                });
             }
 
             transaction.delete(querrySnapshot.docs[0].ref);
@@ -140,6 +126,5 @@ export {
     createProductAsync,
     editProductAsync, 
     deleteProductAsync,
-    addOrgIdToAllProductsAsync
 };
 
