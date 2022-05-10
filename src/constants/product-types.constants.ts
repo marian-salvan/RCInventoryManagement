@@ -2,6 +2,8 @@ export enum PRODUCT_TYPE_ENG {
     FOOD = "food",
     HYGIENE = "hygiene",
     SANITARY = "sanitary",
+    CLOTHING = "clothing",
+    FOOTWEAR = "footwear",
     OTHERS = "others"
 }
 
@@ -9,6 +11,8 @@ export enum PRODUCT_TYPE_RO {
     FOOD = "alimente",
     HYGIENE = "materiale de igienă",
     SANITARY = "materiale sanitare",
+    CLOTHING = "îmbrăcăminte",
+    FOOTWEAR = "încălțăminte",
     OTHERS = "altele"
 }
 
@@ -16,6 +20,8 @@ export const productTypesRoToEngMap = new Map<string, string>([
     [PRODUCT_TYPE_RO.FOOD, PRODUCT_TYPE_ENG.FOOD],
     [PRODUCT_TYPE_RO.HYGIENE, PRODUCT_TYPE_ENG.HYGIENE],
     [PRODUCT_TYPE_RO.SANITARY, PRODUCT_TYPE_ENG.SANITARY],
+    [PRODUCT_TYPE_RO.CLOTHING, PRODUCT_TYPE_ENG.CLOTHING],
+    [PRODUCT_TYPE_RO.FOOTWEAR, PRODUCT_TYPE_ENG.FOOTWEAR],
     [PRODUCT_TYPE_RO.OTHERS, PRODUCT_TYPE_ENG.OTHERS],
 ]);
 
@@ -23,6 +29,8 @@ export const productTypesEngToRoMap = new Map<string, string>([
     [PRODUCT_TYPE_ENG.FOOD, PRODUCT_TYPE_RO.FOOD],
     [PRODUCT_TYPE_ENG.HYGIENE, PRODUCT_TYPE_RO.HYGIENE],
     [PRODUCT_TYPE_ENG.SANITARY, PRODUCT_TYPE_RO.SANITARY],
+    [PRODUCT_TYPE_ENG.CLOTHING, PRODUCT_TYPE_RO.CLOTHING],
+    [PRODUCT_TYPE_ENG.FOOTWEAR, PRODUCT_TYPE_RO.FOOTWEAR],
     [PRODUCT_TYPE_ENG.OTHERS, PRODUCT_TYPE_RO.OTHERS],
 ]);
 
@@ -30,5 +38,7 @@ export const productTypesOptions = [
     PRODUCT_TYPE_RO.FOOD, 
     PRODUCT_TYPE_RO.HYGIENE, 
     PRODUCT_TYPE_RO.SANITARY,
+    PRODUCT_TYPE_RO.CLOTHING,
+    PRODUCT_TYPE_RO.FOOTWEAR,
     PRODUCT_TYPE_RO.OTHERS
 ];
