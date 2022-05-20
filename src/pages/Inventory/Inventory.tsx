@@ -40,9 +40,11 @@ const Inventory: FC<InventoryProps> = () => {
   const categoryFilter = useAppSelector(gridCategoryFilter);
   const userMetadata = useAppSelector(loggedInUserMetadata);
   const activeOrgCampaign = useAppSelector(activeCampaign);
+  const gridFilter = useAppSelector(gridCategoryFilter);
 
   const [displayInventory, setDisplayInventory] = useState<ReportProductModel[]>([]);
   const [orderByColumn, setOrderByColumn] = useState<string>(GRID_SORT_ENUM.NAME);
+  const [categoryName, setCategory] = useState<string>("");
 
   useEffect(() => {
     if (userMetadata && activeOrgCampaign) {
@@ -137,6 +139,10 @@ const Inventory: FC<InventoryProps> = () => {
     }
   }, [newReport])
 
+  useEffect(() => {
+    gridFilter ? setCategory(gridFilter) : setCategory(appLabels.get("all") as string);
+  }, [gridFilter])
+
   const openAddQtyModal = (reportProduct: ReportProductModel) => {
     dispatch(setQuantityModalModel({
       modalTitle: appMessages.get("addQuantityModalTitle") as string,
@@ -183,7 +189,8 @@ const Inventory: FC<InventoryProps> = () => {
       inventoryProducts: currentInventoryReport?.inventory as ReportProductModel[]
     }
 
-    dispatch(setModifyInvProductsModalModel(modalModel));  }
+    dispatch(setModifyInvProductsModalModel(modalModel));  
+  }
 
   const sortAfterColumn = (sortColumn: string) => {
     setOrderByColumn(sortColumn);
@@ -204,7 +211,7 @@ const Inventory: FC<InventoryProps> = () => {
                 userHasAccess() &&
                 <div className="button-container">
                   <Button className="add-button" color="danger" onClick={() => showCloseConfirmationModal()}>{appLabels.get("closeCurrentInventory")}</Button>
-                  <Button className="add-button" color="primary" onClick={() => downloadReport()}>{appLabels.get("downloadIntemReport")}</Button>
+                  <Button className="add-button" color="primary" onClick={() => downloadReport()}>{appLabels.get("downloadIntemReport") + (categoryName !== "" ? ` (${categoryName})` : "")}</Button>
                 </div>
               }
             </CardTitle>

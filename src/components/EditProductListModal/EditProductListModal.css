@@ -1,3 +1,11 @@
 .warning-message {
     color: #dc3545;
 }
+
+.select__indicator.select__clear-indicator.css-tlfecz-indicatorContainer {
+    display: none !important;
+}
+
+.select__indicator.select__clear-indicator.css-1gtu0rj-indicatorContainer {
+    display: none !important;
+}

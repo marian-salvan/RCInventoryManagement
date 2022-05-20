@@ -36,7 +36,8 @@ export const appMessages = new Map<string, string>([
   ["createNewCampaigTitle", "Creați campanie"],
   ["modifyInventoryProductsTitle", "Modificați produsele din inventar"],
   ["modifyInventoryProductsMessage", `Atenție! Produsele pe care le veți scoate din inventar vor avea stocul șters! 
-                                      Le veți putea adăuga din nou dar stocul lor va fi reinițializat cu 0.`],
+                                      Le veți putea adăuga din nou dar stocul lor va fi reinițializat cu 0.
+                                      Descărcați un raport intermediar înainte de șterge produse.`],
   ["addProductWarning", `Produsul nu va fi adăugat automat în niciun inventar activ din nicio campanie. 
                          Va trebui să-l adăugați manual din inventar dorit.`]
 ])

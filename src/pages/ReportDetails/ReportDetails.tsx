@@ -64,7 +64,6 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
     gridFilter ? setCategory(gridFilter) : setCategory(appLabels.get("all") as string);
   }, [gridFilter])
   
-  
   const downloadReport = () => {
     dowloadReport("report-table", activeOrgCampaign?.name as string, inventoryReport, packagesReport, categoryFilter);
   }
