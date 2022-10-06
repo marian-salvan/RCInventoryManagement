@@ -11,7 +11,6 @@ const getActiveInventoryReportsAsync = createAsyncThunk(
     async ({db, orgId, campaignId}: {db: Firestore | null, orgId: string, campaignId: string}) => {
         const productsRef = collection(db as Firestore, inventoryReportsCollection);
 
-        debugger;
         return await getDocs(query(productsRef, 
             where("active", "==", true),
             where("orgId", "==", orgId),

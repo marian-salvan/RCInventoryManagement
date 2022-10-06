@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FirebaseApp } from 'firebase/app';
 import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
-import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
+import { AddEditCategoryModalModel, AddEditUnitModalModel, AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
 import { InventoryReport, NewReportModel, PacakagesReport, ReportProductModel } from '../models/reports.models';
 import { UserMetadataModel } from '../models/user.model';
@@ -18,6 +18,10 @@ import { initialState } from './app.state';
 import { appErrors } from '../constants/messages.constants';
 import { changeActiveCampaignAsync, createCampaignAsync, getAllCampaignsForOrgAsync } from '../thunks/campaigns.thunk';
 import { CampaignModel } from '../models/campaigns.models';
+import { createCategoryAsync, deleteCategoryAsync, editCategoryAsync, getAllCategoriesAsync } from '../thunks/categories.thunk';
+import { CategoryModel } from '../models/categories.models';
+import { UnitModel } from '../models/units.models';
+import { createUnitAsync, deleteUnitAsync, editUnitAsync, getAllUnitsAsync } from '../thunks/units.thunk';
 
 export const appSlice = createSlice({
   name: 'app',
@@ -104,6 +108,18 @@ export const appSlice = createSlice({
     },
     setModifyInvProductsModalModel (state, action: PayloadAction<ModifyInvProductsModalModel>) {
       state.modifyInvProductsModalModel = action.payload;
+    },
+    setCategoryToBeDeleted (state, action: PayloadAction<CategoryModel | null>) {
+      state.categoryToBeDeleted = action.payload;
+    },
+    setAddEditCategoryModalModel (state, action: PayloadAction<AddEditCategoryModalModel | null>) {
+      state.addEditCategoryModalModel = action.payload;
+    },
+    setUnitToBeDeleted (state, action: PayloadAction<UnitModel | null>) {
+      state.unitToBeDeleted = action.payload;
+    },
+    setAddEditUnitModalModel (state, action: PayloadAction<AddEditUnitModalModel | null>) {
+      state.addEditUnitModalModel = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -453,7 +469,120 @@ export const appSlice = createSlice({
         state.errorModalModel.showError = true;
         state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
       })
+
+      //categories
+      .addCase(getAllCategoriesAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(getAllCategoriesAsync.fulfilled, (state, action) => {
+        state.allCategories = action.payload.docs.map(doc => doc.data() as CategoryModel);
+        state.showLoader = false;
+      })
+      .addCase(getAllCategoriesAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;    
+      })
+      .addCase(createCategoryAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(createCategoryAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(createCategoryAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      .addCase(editCategoryAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(editCategoryAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(editCategoryAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      .addCase(deleteCategoryAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(deleteCategoryAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.categoryToBeDeleted = null;
+        state.showLoader = false;
+      })
+      .addCase(deleteCategoryAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.categoryToBeDeleted = null;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+
+       //units
+      .addCase(getAllUnitsAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(getAllUnitsAsync.fulfilled, (state, action) => {
+        state.allUnits = action.payload.docs.map(doc => doc.data() as UnitModel);
+        state.showLoader = false;
+      })
+      .addCase(getAllUnitsAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;    
+      })    
+      .addCase(createUnitAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(createUnitAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(createUnitAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      .addCase(editUnitAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(editUnitAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.showLoader = false;
+      })
+      .addCase(editUnitAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
+      .addCase(deleteUnitAsync.pending, (state) => {
+        state.showLoader = true;
+        state.errorModalModel = { showError: false, errorMesage: appErrors.get("genericErrorMessage") as string }
+      })
+      .addCase(deleteUnitAsync.fulfilled, (state, action) => {
+        state.reloadProductsTable = true;
+        state.unitToBeDeleted = null;
+        state.showLoader = false;
+      })
+      .addCase(deleteUnitAsync.rejected, (state, action) => {
+        state.showLoader = false;
+        state.unitToBeDeleted = null;
+        state.errorModalModel.showError = true;
+        state.errorModalModel.errorMesage = action.error.message ? action.error.message : appErrors.get("genericErrorMessage") as string;
+      })
     },
+    
 });
 
 export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen, setLoggedInUser, 
@@ -461,7 +590,8 @@ export const { setFromLocation, setFirebaseApp, setFirebaseDb, setSideBarIsOpen,
   setProductToBeAdded, setProductToBeEdited, setReloadProductsTable, setReloadReportsTable, setNewReportModel,
   setQuantityModalModel, setInventoryEntryToAdd, setInventoryEntryToSubstract, setNewReportModal,
   setPackagesModalModel, setGridSearchText, setErrorModalModel, setGridCategoryFilter, setNewCampaignModal,
-  setNewCampaign, setReloadCampaignTable, setActiveCampaign, setModifyInvProductsModalModel } = appSlice.actions;
+  setNewCampaign, setReloadCampaignTable, setActiveCampaign, setModifyInvProductsModalModel,
+  setCategoryToBeDeleted, setAddEditCategoryModalModel, setUnitToBeDeleted, setAddEditUnitModalModel } = appSlice.actions;
 
 export const fromLocation = (state: RootState) => state.appReducer.fromLocation;
 export const firebaseApp = (state: RootState) => state.appReducer.firebaseApp;
@@ -499,5 +629,11 @@ export const newCampaign = (state: RootState) => state.appReducer.newCampaign;
 export const reloadCampaignTable = (state: RootState) => state.appReducer.reloadCampaignTable;
 export const activeCampaign = (state: RootState) => state.appReducer.activeCampaign;
 export const modifyInvProductsModalModel = (state: RootState) => state.appReducer.modifyInvProductsModalModel;
+export const allCategories = (state: RootState) => state.appReducer.allCategories;
+export const allUnits = (state: RootState) => state.appReducer.allUnits;
+export const categoryToBeDeleted = (state: RootState) => state.appReducer.categoryToBeDeleted;
+export const addEditCategoryModalModel = (state: RootState) => state.appReducer.addEditCategoryModalModel;
+export const unitToBeDeleted = (state: RootState) => state.appReducer.unitToBeDeleted;
+export const addEditUnitModalModel = (state: RootState) => state.appReducer.addEditUnitModalModel;
 
 export default appSlice.reducer;

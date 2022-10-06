@@ -3,6 +3,9 @@ export const appMessages = new Map<string, string>([
   ["appTitleCrr", "CRR Cluj - Gestiunea donațiilor"],
   ["appGreeting", "Salut"],
   ["productsTitle", "Produse"],
+  ["categoriesTitle", "Categorii & Unități"],
+  ["seeCategoriesTitle", "Vezi categorii"],
+  ["seeUnitsTitle", "Vezi unități"],
   ["inventoryTitle", "Inventar"],
   ["packagesTitle", "Pachete"],
   ["reportsTitle", "Rapoarte"],
@@ -33,13 +36,19 @@ export const appMessages = new Map<string, string>([
   ["noActiveInventoryPckgs", "Pentru a adăuga pachete aveți nevoie de un invetar activ. Contactați administratorul pentru crearea lui."],
   ["editWarning", "Datele acestui produs vor fi schimbate și în toate inventarele active din toate campaniile. Sigur doriți să efectuați această operație?"],
   ["campaigns", "Campanii"],
-  ["createNewCampaigTitle", "Creați campanie"],
+  ["createNewCampaigTitle", "Creați campanie nouă"],
+  ["createNewCategoryTitle", "Creați categorie nouă"],
+  ["createNewUnitTitle", "Creați unitate nouă"],
   ["modifyInventoryProductsTitle", "Modificați produsele din inventar"],
   ["modifyInventoryProductsMessage", `Atenție! Produsele pe care le veți scoate din inventar vor avea stocul șters! 
                                       Le veți putea adăuga din nou dar stocul lor va fi reinițializat cu 0.
                                       Descărcați un raport intermediar înainte de șterge produse.`],
   ["addProductWarning", `Produsul nu va fi adăugat automat în niciun inventar activ din nicio campanie. 
-                         Va trebui să-l adăugați manual din inventar dorit.`]
+                         Va trebui să-l adăugați manual din inventar dorit.`],
+  ["deleteCategoryModalTitle", "Confirmă ștergerea categoriei"], 
+  ["deleteCategoryModalMessage", "Doriți să ștergeți această categorie?"],
+  ["deleteUnitModalTitle", "Confirmă ștergerea unității"], 
+  ["deleteUnitModalMessage", "Doriți să ștergeți această unitate?"], 
 ])
 
 export const appErrors = new Map<string, string>([
@@ -49,7 +58,11 @@ export const appErrors = new Map<string, string>([
     ["noProductInInventory", "Nu am găsit produsul în inventar"],
     ["insufficientStock", "Stoc insuficient"],
     ["existingProductName", "Există deja un produs cu acest nume"],
-    ["existingCampaignName", "Există deja o campanie cu acest nume"]
+    ["existingCampaignName", "Există deja o campanie cu acest nume"],
+    ["categoryUsedByAProduct", "Categoria nu poate fi schimbată deoarece este folosită de unul sau mai multe produse"],
+    ["unitUsedByAProduct", "Unitatea nu poate fi schimbată deoarece este folosită de unul sau mai multe produse"],
+    ["existingCategoryName", "Există deja o categorie cu acest nume"],
+    ["existingUnitName", "Există deja o unitate cu acest nume"],
 ]);
 
 export const appLabels = new Map<string, string>([
@@ -105,6 +118,8 @@ export const appLabels = new Map<string, string>([
   ["edit", "Editează"],
   ["addToInventory", "Adaugă produsul la inventarul activ"],
   ["campaignName", "Nume campanie"],
+  ["categoryName", "Nume categorie"],
+  ["unitName", "Nume unitate"],
   ["selectedCampaign", "Campania selectată"],
   ["addProductsToInventory", "Adaugă produse la noul inventar"],
   ["productOption", "Produse de adăugat"],
@@ -114,7 +129,15 @@ export const appLabels = new Map<string, string>([
   ["campaignCreationDate", "Data creării"],
   ["campaignState", "Stare"],
   ["campaignActive", "activă"],
-  ["campaignInactive", "inactivă"]
+  ["campaignInactive", "inactivă"],
+  ["categoryName", "Nume categorie"],
+  ["editCategory", "Editează categoria"],
+  ["deleteCategory", "Șterge categoria"],  
+  ["unitName", "Nume unitate"],
+  ["editUnit", "Editează unitatea"],
+  ["deleteUnit", "Șterge unitatea"],
+  ["addCategory", "Adaugă categorie"],
+  ["addUnit", "Adaugă unitate"]
 ]);
 
 export const appValidations = new Map<string, string>([

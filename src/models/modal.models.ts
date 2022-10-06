@@ -1,4 +1,6 @@
+import { CategoryModel } from "./categories.models";
 import { ReportProductModel } from "./reports.models";
+import { UnitModel } from "./units.models";
 
 export interface ConfirmationModalModel {
     title: string;
@@ -21,4 +23,14 @@ export interface ErrorModalModel {
 export interface ModifyInvProductsModalModel {
   showModal: boolean;
   inventoryProducts: ReportProductModel[];
+}
+
+export interface AddEditCategoryModalModel {
+  showModal: true;
+  categoryModel: CategoryModel | null;
+}
+
+export interface AddEditUnitModalModel {
+  showModal: true;
+  unitModel: UnitModel | null;
 }

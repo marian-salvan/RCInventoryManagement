@@ -51,6 +51,11 @@ const SideBar = () => {
             <i className="bi bi-bag-heart"></i> {appMessages.get("productsTitle")} 
             </NavLink>
           </NavItem>
+          <NavItem className={checkActiveRoute("/categories") ? "active-route" : ""}>
+            <NavLink tag={Link} to={"/categories/categories-tab"}>
+            <i className="bi bi-layout-text-sidebar"></i> {appMessages.get("categoriesTitle")} 
+            </NavLink>
+          </NavItem>
           <NavItem className={checkActiveRoute("/inventory") ? "active-route" : ""}>
             <NavLink tag={Link} to={"/inventory"} >
             <i className="bi bi-clipboard2"></i> {appMessages.get("inventoryTitle")}  
@@ -72,7 +77,7 @@ const SideBar = () => {
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink onClick={ () => logOut()}><i className="bi bi-power"></i> {appMessages.get("logOutTitle")}</NavLink>
+            <NavLink onClick={() => logOut()}><i className="bi bi-power"></i> {appMessages.get("logOutTitle")}</NavLink>
           </NavItem>
         </Nav>
       </div>

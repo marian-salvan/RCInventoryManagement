@@ -6,12 +6,15 @@ import GridSearch from '../../components/GridSearch/GridSearch';
 import { appLabels, appMessages } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { ROLES } from '../../constants/roles.enums';
+import { getCategoryName } from '../../helpers/categories.helper';
 import { ProductModel } from '../../models/products.models';
 import { actionAccepted, allProducts, fireStoreDatabase, gridSearchText, loggedInUserMetadata,
    productToBeAdded, reloadProductsTable, setActionAccepted, setAddEditProductModal, setConfirmationModal,
    setConfirmationModalModel, setGridSearchText, setProductToBeAdded, setProductToBeEdited, setReloadProductsTable } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { getAllCategoriesAsync } from '../../thunks/categories.thunk';
 import { createProductAsync, deleteProductAsync, getAllProductsAsync } from '../../thunks/products.thunk';
+import { getAllUnitsAsync } from '../../thunks/units.thunk';
 import './Products.css';
 
 interface ProductsProps {}
@@ -34,6 +37,8 @@ const Products: FC<ProductsProps> = () => {
       const orgId = userMetadata?.orgId as string;
 
       dispatch(getAllProductsAsync({db, orgId}));
+      dispatch(getAllCategoriesAsync({db, orgId}));
+      dispatch(getAllUnitsAsync({db, orgId}));
     }
 
     return () => {
@@ -74,6 +79,8 @@ const Products: FC<ProductsProps> = () => {
   useEffect(() => {
     if (newProduct) {
       const product = newProduct as ProductModel;
+
+      debugger
 
       dispatch(createProductAsync({db, product}));
       dispatch(setProductToBeAdded(null));
@@ -137,7 +144,7 @@ const Products: FC<ProductsProps> = () => {
                   <tr key={product.name}>
                     <th scope="row">{index + 1}</th>
                     <td>{product.name}</td>
-                    <td>{productTypesEngToRoMap.get(product.type)}</td>
+                    <td>{getCategoryName(product.type)}</td>
                     { userHasAccess() && <td>{product.referencePrice}</td> }
                     <td>{product.unit}</td>
                     { userHasAccess() && <td className="table-centered-cell"><i onClick={() => deleteProduct(product)} className="bi bi-x-circle" title={appLabels.get("deleteProduct")}></i></td> }

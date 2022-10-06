@@ -16,6 +16,9 @@ import InventoryManagerRoute from "../InventoryManagerRoute/InventoryManagerRout
 import ReportDetails from "../../pages/ReportDetails/ReportDetails";
 import Campaigns from "../../pages/Campaigns/Campaigns";
 import TopBar from "../TopBar/TopBar";
+import Categories from "../../pages/Categories/Categories";
+import CategoriesTab from "../CategoriesTab/CategoriesTab";
+import UnitsTab from "../UnitsTab/UnitsTab";
 
 const Content = () => {
   const isOpen = useAppSelector(sideBarIsOpen);
@@ -28,6 +31,10 @@ const Content = () => {
         <Route path="/" element={<Login />} />
         <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>}/>
         <Route path="/inventory" element={<InventoryManagerRoute><Inventory /></InventoryManagerRoute>}/>
+        <Route path="/categories" element={<AdminRoute><Categories /></AdminRoute>}>
+          <Route path="categories-tab" element={<CategoriesTab />}></Route>
+          <Route path="units-tab" element={<UnitsTab />}></Route>
+        </Route>
         <Route path="/package-management" element={ <InventoryManagerRoute><PackageManagement /></InventoryManagerRoute> } />
         <Route path="/reports" element={ <AdminRoute><Reports /></AdminRoute>} />
         <Route path="/campaigns" element={ <InventoryManagerRoute><Campaigns /></InventoryManagerRoute>} />

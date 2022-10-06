@@ -3,9 +3,11 @@ import { User } from 'firebase/auth';
 import { Firestore } from 'firebase/firestore';
 import { appErrors, appMessages } from '../constants/messages.constants';
 import { CampaignModel } from '../models/campaigns.models';
-import { AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
+import { CategoryModel } from '../models/categories.models';
+import { AddEditCategoryModalModel, AddEditUnitModalModel, AddRemoveModalModel, ConfirmationModalModel, ErrorModalModel, ModifyInvProductsModalModel } from '../models/modal.models';
 import { ProductModel } from '../models/products.models';
 import { InventoryReport, NewReportModel, PacakagesReport, ReportProductModel } from '../models/reports.models';
+import { UnitModel } from '../models/units.models';
 import { UserMetadataModel } from '../models/user.model';
 
 export interface AppState {
@@ -45,6 +47,12 @@ export interface AppState {
     reloadCampaignTable: boolean;
     activeCampaign: CampaignModel | null;
     modifyInvProductsModalModel: ModifyInvProductsModalModel;
+    allCategories: CategoryModel[] | null;
+    allUnits: UnitModel[] | null;
+    categoryToBeDeleted: CategoryModel | null;
+    unitToBeDeleted: UnitModel | null;
+    addEditCategoryModalModel: AddEditCategoryModalModel | null;
+    addEditUnitModalModel: AddEditUnitModalModel | null;
 }
   
 export const initialState: AppState = {
@@ -93,5 +101,11 @@ export const initialState: AppState = {
     modifyInvProductsModalModel: {
         showModal: false,
         inventoryProducts: []
-    }
+    },
+    allCategories: null,
+    allUnits: null,
+    categoryToBeDeleted: null,
+    unitToBeDeleted: null,
+    addEditCategoryModalModel: null,
+    addEditUnitModalModel: null
 };

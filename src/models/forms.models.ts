@@ -27,3 +27,13 @@ export interface NewCampaignStateModel {
     name: string;
     validName: boolean | null;
 }
+
+export interface NewCategoryStateModel {
+    name: string;
+    validName: boolean | null;
+}
+
+export interface NewUniStateModel {
+    name: string;
+    validName: boolean | null;
+}

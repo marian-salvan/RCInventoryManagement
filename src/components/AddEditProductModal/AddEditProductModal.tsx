@@ -1,11 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { appLabels, appMessages, appValidations } from '../../constants/messages.constants';
-import { productTypesEngToRoMap, productTypesOptions, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
-import { MEASSUREMENT_UNITS, unitOptions } from '../../constants/units.constants';
+import { productTypesEngToRoMap, productTypesRoToEngMap, PRODUCT_TYPE_RO } from '../../constants/product-types.constants';
+import { MEASSUREMENT_UNITS } from '../../constants/units.constants';
+import { getCategoryName, getCategoryNameForSave } from '../../helpers/categories.helper';
 import { ProductAddStateModel } from '../../models/forms.models';
 import { ProductModel } from '../../models/products.models';
-import { fireStoreDatabase, loggedInUserMetadata, productToBeEdited, setAddEditProductModal, setProductToBeAdded, setProductToBeEdited, showAddEditProductModal } from '../../reducers/app.reducer';
+import { allCategories, allUnits, fireStoreDatabase, loggedInUserMetadata, productToBeEdited, setAddEditProductModal, 
+  setProductToBeAdded, setProductToBeEdited, showAddEditProductModal } from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { editProductAsync } from '../../thunks/products.thunk';
 import './AddEditProductModal.css';
@@ -18,6 +20,8 @@ const AddProductModal: FC<AddProductModalProps> = () => {
   const saveEdit = useAppSelector(showAddEditProductModal);
   const prdToBeEdited = useAppSelector(productToBeEdited);
   const userMetadata = useAppSelector(loggedInUserMetadata);
+  const unitOptions = useAppSelector(allUnits);
+  const categoriesOptions = useAppSelector(allCategories);
   const [addProductModel, setAddProductModel] = useState<ProductAddStateModel>({
     uid: "",
     name: "",
@@ -98,12 +102,13 @@ const AddProductModal: FC<AddProductModalProps> = () => {
     if (saveEdit) {
       const { v4: uuidv4 } = require('uuid');
 
+
       const product: ProductModel = { 
         uid: uuidv4(),
         name: addProductModel.name.toLocaleLowerCase(), 
         referencePrice: addProductModel.referencePrice as number, 
         unit: addProductModel.unit,
-        type: productTypesRoToEngMap.get(addProductModel.type) as string,
+        type: getCategoryNameForSave(addProductModel.type),
         orgId: userMetadata?.orgId as string
       };
   
@@ -191,8 +196,8 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               <Label for="unit">{appLabels.get("category")}</Label>
               <Input type="select" name="type" id="type" onChange={handleInputChange} value={addProductModel.type}>
                 {
-                  productTypesOptions.map(opt => (
-                    <option key={opt}>{opt}</option>
+                  categoriesOptions?.map(opt => (
+                    <option key={opt.uid}>{getCategoryName(opt.name)}</option>
                   ))
                 }
               </Input>
@@ -201,8 +206,8 @@ const AddProductModal: FC<AddProductModalProps> = () => {
               <Label for="unit">{appLabels.get("unit")}</Label>
               <Input type="select" name="unit" id="unit" onChange={handleInputChange} value={addProductModel.unit}>
                 {
-                  unitOptions.map(opt => (
-                    <option key={opt}>{opt}</option>
+                  unitOptions?.map(opt => (
+                    <option key={opt.uid}>{opt.name}</option>
                   ))
                 }
               </Input>

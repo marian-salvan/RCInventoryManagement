@@ -18,13 +18,13 @@ import  './Inventory.css';
 import { defaulPackagesReportModel, defaultInventoryReportModel } from '../../constants/default.configs';
 import { ROLES } from '../../constants/roles.enums';
 import { appLabels, appMessages } from '../../constants/messages.constants';
-import { productTypesEngToRoMap } from '../../constants/product-types.constants';
 import { dowloadReport } from '../../helpers/reports.helper';
 import GridCategoryFilter from '../../components/GridCategoryFilter/GridCategoryFilter';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 import EditProductListModal from '../../components/EditProductListModal/EditProductListModal';
 import { ModifyInvProductsModalModel } from '../../models/modal.models';
+import { getCategoryName } from '../../helpers/categories.helper';
 
 interface InventoryProps {}
 
@@ -74,7 +74,7 @@ const Inventory: FC<InventoryProps> = () => {
   useEffect(() => { 
     if (currentInventoryReport) {
       const sortedInventory = currentInventoryReport.inventory.map(product => {
-        return {...product, type: productTypesEngToRoMap.get(product.type) as string};
+        return {...product, type: getCategoryName(product.type)};
       }).sort(getProductModelSortingFunc(orderByColumn));
 
       const searchedInventory = (searchText !== null) ? sortedInventory.filter(x => x.name.includes(searchText)):

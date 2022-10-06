@@ -1,0 +1,16 @@
+.categories-nav-link {
+    color: black !important;
+}
+
+.units-nav-link {
+    color: black !important;
+}
+
+.categories-nav-link.active {
+    color: #fff !important;
+}
+
+
+.units-nav-link.active {
+    color: #fff !important;
+}

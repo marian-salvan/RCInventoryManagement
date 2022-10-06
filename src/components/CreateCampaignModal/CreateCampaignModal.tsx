@@ -95,7 +95,7 @@ const CreateCampaignModal: FC<CreateCampaignModalProps> = () =>  {
           <Button color="secondary" onClick={toggle}>{appLabels.get("cancel")}</Button>
         </ModalFooter>
       </Modal>
-  </div>
+    </div>
   );
 }
 

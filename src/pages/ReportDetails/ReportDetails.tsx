@@ -7,12 +7,14 @@ import QuantityModal from '../../components/QuantityModal/QuantityModal';
 import { GRID_SORT_ENUM } from '../../constants/grid.constants';
 import { appLabels } from '../../constants/messages.constants';
 import { productTypesEngToRoMap } from '../../constants/product-types.constants';
+import { getCategoryName } from '../../helpers/categories.helper';
 import { convertTimeStampToDateString } from '../../helpers/date.helper';
 import { dowloadReport } from '../../helpers/reports.helper';
 import { getProductModelSortingFunc } from '../../helpers/sorting.helper';
 import { ReportProductModel } from '../../models/reports.models';
 import { activeCampaign, fireStoreDatabase, gridCategoryFilter, loggedInUserMetadata, selectedInventoryReport, selectedPackageReport, setGridCategoryFilter} from '../../reducers/app.reducer';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { getAllCategoriesAsync } from '../../thunks/categories.thunk';
 import { getInventoryReportsByUidAsync } from '../../thunks/inventory-reports.thunk';
 import { getPackagesReportsByUidAsync } from '../../thunks/packages-reports.thunk';
 import  './ReportDetails.css';
@@ -42,6 +44,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
 
       dispatch(getInventoryReportsByUidAsync({db, uid, orgId, campaignId}));
       dispatch(getPackagesReportsByUidAsync({db, uid, orgId, campaignId}));
+      dispatch(getAllCategoriesAsync({db, orgId}));
     }
 
     return () => {
@@ -52,7 +55,7 @@ const ReportDetails: FC<ReportDetailsProps> = () => {
   useEffect(() => {
     if (inventoryReport) {
       const reports = inventoryReport.inventory.map(product => {
-        return {...product, type: productTypesEngToRoMap.get(product.type) as string};
+        return {...product, type: getCategoryName(product.type)};
       }).sort(getProductModelSortingFunc(GRID_SORT_ENUM.TYPE));
 
       (categoryFilter !== null) ? setDisplayInventory(reports.filter(x => x.type === categoryFilter)) :
